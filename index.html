@@ -65,7 +65,6 @@ p{color:var(--mut);font-size:.95rem}
 .adslot.busy{cursor:default;border-color:var(--orange);animation:pulse 1.6s infinite}
 .adslot.busy .play,.adslot.done .play{display:none}
 .adslot.done{cursor:default;border-color:var(--green);box-shadow:0 0 26px rgba(45,255,154,.45)}
-#btnAd{display:none!important}
 .stick{position:sticky;top:8px;z-index:4;background:rgba(10,12,30,.92)}
 #sStage>.adslot{margin-top:0}
 .timer{display:flex;align-items:center;gap:14px;justify-content:center;margin:12px 0 2px}
@@ -114,12 +113,10 @@ p{color:var(--mut);font-size:.95rem}
       <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="pgBar"><i id="pgFill"></i></div>
       <div class="dots" id="dots"></div>
     </div>
-    <div class="adslot" id="adSlot" role="button" tabindex="0" aria-label="Ventana de anuncio: tócala para iniciar"><div class="play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3v18l16-9z"/></svg></div><span id="adTxt">TOCA AQUÍ PARA VER EL ANUNCIO</span></div>
     <div class="card">
       <h2 id="stTitle"></h2>
       <p id="stText"></p>
       <div class="status" id="status" aria-live="polite"></div>
-      <button class="btn b-ad" id="btnAd">VER ANUNCIO</button>
       <button class="btn b-main" id="btnPhase2" disabled>SEGUIR</button>
       <div class="timer hide" id="timerBox"><div class="ring"><svg viewBox="0 0 80 80"><circle class="t" cx="40" cy="40" r="36"/><circle class="p" id="ringP" cx="40" cy="40" r="36"/></svg><b id="tNum">–</b></div></div>
       <button class="btn b-ok hide" id="btnNext" disabled>CONTINUAR</button>
@@ -189,9 +186,7 @@ const CONFIG = {
     { src: "https://al5sm.com/tag.min.js",        zone: "12130485" },
     { src: "https://n6wxm.com/vignette.min.js",   zone: "12130495" }
   ],
-  adWaitSeconds: 20,   // si en este tiempo no entra al anuncio, puede tocar de nuevo
   verifySeconds: 3,    // "Verificando…" oculto (no muestra números)
-  adClickUrl: "",      // enlace del anuncio activado por el usuario (deja "" para no abrir nada)
   storageKey: "kendy_progress_v1",
   resetAfterHiddenSeconds: 0 // 0 = no reiniciar al salir de la página
 };
@@ -215,7 +210,7 @@ const STAGE_TEXT = [
 /* ---------- Estado ---------- */
 // status: pendiente | iniciada | temporizando | completada
 let S = { done: 0, status: "pendiente", phase: 0, started: false };
-let timerId = null, busy = false, adBlockedFlag = false, waitId = null, leftPage = false;
+let timerId = null, busy = false, adBlockedFlag = false;
 let tLeft = 0, tTotal = 0, lastTick = 0, silent = false;
 
 function save(){ try{ sessionStorage.setItem(CONFIG.storageKey, JSON.stringify({done:S.done,started:S.started})); }catch(e){} }
@@ -251,17 +246,14 @@ function renderProgress(){
     `<span class="${i<S.done?"done":i===S.done?"cur":""}"></span>`).join("");
 }
 
-/* ---------- Anuncios: se inyectan SOLO al tocar la ventana del anuncio ----------
-   Así el anuncio aparece por tu toque y no se dispara al tocar otras partes de la página.
-   En cada toque se reemplazan los scripts para que se muestre un anuncio por etapa. */
-let adsInjected=false;
-function injectAds(){
-  if(!CONFIG.autoAds || adsInjected) return;
-  adsInjected=true;
-  $$("script[data-adtag]").forEach(x=>x.remove());
+/* ---------- Anuncios automáticos (se cargan UNA sola vez al abrir la web) ---------- */
+let adsLoaded=false;
+function loadAutoAds(){
+  if(!CONFIG.autoAds || adsLoaded) return;
+  adsLoaded=true;
   CONFIG.adScripts.forEach(a=>{
     const s=document.createElement("script");
-    s.dataset.zone=a.zone; s.dataset.adtag="1"; s.src=a.src;
+    s.dataset.zone=a.zone; s.src=a.src;
     (document.body||document.documentElement).appendChild(s);
   });
 }
@@ -296,7 +288,7 @@ $("#btnRecheck").addEventListener("click", async ()=>{
   const b=$("#btnRecheck"); b.disabled=true; b.textContent="COMPROBANDO…";
   const r=await checkAds();
   b.disabled=false; b.textContent="VOLVER A COMPROBAR";
-  if(r==="ok"){ adBlockedFlag=false; closeM("#mAdblock"); }
+  if(r==="ok"){ adBlockedFlag=false; closeM("#mAdblock"); if($("#sStage").classList.contains("on")) startVerify(); }
   else if(r==="offline"){ $("#mAdblock p").textContent="No hay conexión a internet. Revísala e inténtalo de nuevo."; }
   else { $("#mAdblock p").textContent="Parece que la publicidad no se está cargando. Desactiva el bloqueador de anuncios para continuar o comprueba tu conexión."; }
 });
@@ -319,15 +311,15 @@ function renderStage(){
   const i=S.done, [t,x]=STAGE_TEXT[i%STAGE_TEXT.length];
   $("#stTitle").textContent=t; $("#stText").textContent=x;
   $("#stNote").textContent = i===CONFIG.stages-1 && CONFIG.youtubeUrl ? "Tip: visita también nuestro canal de YouTube." : "";
-  S.status="pendiente"; S.phase=0; clearTimer(); clearTimeout(waitId); adsInjected=false; leftPage=false;
-  $("#btnAd").disabled=false;
+  S.status="pendiente"; S.phase=0; clearTimer();
   $("#btnPhase2").classList.remove("hide","pulse"); $("#btnPhase2").disabled=true; $("#btnPhase2").textContent="SEGUIR";
   $("#btnNext").classList.add("hide"); $("#btnNext").classList.remove("pulse"); $("#btnNext").disabled=true;
   $("#timerBox").classList.add("hide");
   $("#tNum").textContent="–"; $("#ringP").style.strokeDashoffset=0;
-  $("#adSlot").className="adslot"; $("#adTxt").textContent="TOCA AQUÍ PARA VER EL ANUNCIO";
-  setStatus("Toca la ventana del anuncio para empezar.");
+  setStatus("Verificando…");
   renderProgress();
+  // La verificación (3 s, sin mostrar números) arranca sola al entrar a cada etapa
+  guardAds().then(ok=>{ if(ok) startVerify(); });
 }
 function drawTimer(){
   if(silent) return;
@@ -347,47 +339,14 @@ function runTimer(sec,onEnd,quiet){
   },200);
 }
 function startVerify(){
-  if(S.phase!==0.2) return;
-  clearTimeout(waitId); S.phase=0.5;
-  $("#adSlot").className="adslot busy"; $("#adTxt").textContent="Verificando…"; setStatus("");  // 3 s sin mostrar cuenta
+  if(S.phase!==0) return;
+  S.phase=0.5; S.status="iniciada"; setStatus("Verificando…");   // 3 s sin mostrar cuenta
   runTimer(CONFIG.verifySeconds,()=>{
     S.phase=1.5; silent=false;
-    $("#adSlot").className="adslot done"; $("#adTxt").textContent="Listo";
     $("#btnPhase2").disabled=false; $("#btnPhase2").classList.add("pulse");
     setStatus("Botón habilitado. Pulsa SEGUIR.");
   },true);
 }
-function onLeave(){ if(S.status==="pendiente"||S.status==="iniciada"){ if(S.phase<=0.2) leftPage=true; } }
-function onBack(){ if(S.phase===0.2 && leftPage) startVerify(); }
-document.addEventListener("visibilitychange",()=>{ document.hidden?onLeave():onBack(); });
-window.addEventListener("blur",onLeave); window.addEventListener("focus",onBack);
-$("#adSlot").addEventListener("pointerdown",()=>{ if(S.status==="pendiente"){ leftPage=false; injectAds(); } },{passive:true});
-$("#btnAd").addEventListener("click", async ()=>{
-  if(busy||S.status!=="pendiente") return; busy=true;
-  try{
-    injectAds();                       // el anuncio sale por este toque
-    if(!(await guardAds())) return;
-    S.status="iniciada"; $("#btnAd").disabled=true; setStatus("Anuncio iniciado…");
-    $("#adSlot").className="adslot busy"; $("#adTxt").textContent="Anuncio en curso…";
-    if(CONFIG.adClickUrl && !isPlaceholder(CONFIG.adClickUrl)){
-      const w=openTab(CONFIG.adClickUrl);
-      if(!w) setStatus("Tu navegador bloqueó la pestaña. El tiempo corre igualmente.");
-    }
-    // Espera a que el usuario ENTRE al anuncio y VUELVA a esta página
-    S.phase=0.2;   // (leftPage se conserva: el anuncio puede abrirse justo al tocar)
-    $("#adTxt").textContent="Entra al anuncio y regresa aquí"; setStatus("");
-    clearTimeout(waitId);
-    waitId=setTimeout(()=>{            // si no se abrió ningún anuncio, permitir reintentar
-      if(S.phase!==0.2 || leftPage) return;
-      S.status="pendiente"; S.phase=0; $("#btnAd").disabled=false; adsInjected=false;
-      $("#adSlot").className="adslot"; $("#adTxt").textContent="TOCA DE NUEVO PARA ABRIR EL ANUNCIO";
-      setStatus("No detectamos que abrieras el anuncio.");
-    },CONFIG.adWaitSeconds*1000);
-    if(leftPage && !document.hidden) startVerify();   // ya salió y volvió durante la comprobación
-  } finally { busy=false; }
-});
-$("#adSlot").addEventListener("click",()=>{ if(S.status==="pendiente") $("#btnAd").click(); });
-$("#adSlot").addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); $("#adSlot").click(); } });
 $("#btnPhase2").addEventListener("click", ()=>{
   if(busy||S.phase!==1.5) return; busy=true;
   S.phase=2; $("#btnPhase2").classList.add("hide"); $("#timerBox").classList.remove("hide");
@@ -462,7 +421,7 @@ function init(){
   $("#siteName").textContent=CONFIG.siteName;
   $("#nStagesTxt").textContent=CONFIG.stages;
   $("#lnkWa").href=$("#fabWa").href=CONFIG.whatsappUrl;
-  fillFile(); load(); particles();
+  fillFile(); load(); particles(); loadAutoAds();
   // Enlace seguro: si no hay URL de WhatsApp válida, ocultar el botón flotante
   if(isPlaceholder(CONFIG.whatsappUrl)){ $("#lnkWa").classList.add("hide"); $("#fabWa").classList.add("hide"); }
   if(S.done>=CONFIG.stages){ finish(); }
