@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070914">
+<title>KENDY MODS · Desbloquea tu descarga</title>
+<style>
+/* ===== VARIABLES (colores editables) ===== */
+:root{
+  --bg:#070914; --card:rgba(255,255,255,.07); --line:rgba(255,255,255,.14);
+  --txt:#eef1ff; --mut:#9aa3c7;
+  --blue:#2f6bff; --purple:#9b4dff; --red:#ff3b5c; --green:#2dff9a; --orange:#ff9a2e; --cyan:#27e6ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--txt);background:
+  radial-gradient(900px 500px at 10% -10%,rgba(155,77,255,.35),transparent 60%),
+  radial-gradient(800px 500px at 100% 10%,rgba(39,230,255,.22),transparent 60%),
+  radial-gradient(900px 600px at 50% 110%,rgba(255,59,92,.25),transparent 60%),var(--bg);
+  background-attachment:fixed;overflow-x:hidden;line-height:1.45}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+main{position:relative;z-index:1;max-width:520px;margin:0 auto;padding:18px 16px 40px}
+.brand{display:flex;align-items:center;gap:10px;justify-content:center;margin:6px 0 18px}
+.brand svg{width:38px;height:38px;filter:drop-shadow(0 0 8px var(--cyan))}
+.brand b{font-size:1.35rem;letter-spacing:.08em;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--red));-webkit-background-clip:text;background-clip:text;color:transparent}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 0 0 1px rgba(39,230,255,.08),0 12px 40px rgba(0,0,0,.45),0 0 30px rgba(155,77,255,.12);margin-bottom:14px}
+h1{font-size:clamp(1.7rem,8vw,2.3rem);line-height:1.08;text-align:center;margin-bottom:10px;text-shadow:0 0 22px rgba(47,107,255,.6)}
+h2{font-size:1.15rem;margin-bottom:6px}
+p{color:var(--mut);font-size:.95rem}
+.center{text-align:center}
+.screen{display:none}.screen.on{display:block;animation:in .45s ease both}
+.screen.out{animation:out .25s ease both}
+@keyframes in{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes out{to{opacity:0;transform:translateY(-10px)}}
+.btn{display:block;width:100%;min-height:54px;border:0;border-radius:16px;padding:14px 18px;font:800 1.02rem inherit;font-family:inherit;color:#fff;letter-spacing:.04em;cursor:pointer;margin-top:12px;position:relative;overflow:hidden;transition:transform .12s,filter .2s,box-shadow .2s}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.btn:disabled{filter:grayscale(1) brightness(.55);cursor:not-allowed}
+.b-main{background:linear-gradient(90deg,var(--blue),var(--purple));box-shadow:0 0 22px rgba(47,107,255,.55)}
+.b-ad{background:linear-gradient(90deg,var(--orange),var(--red));box-shadow:0 0 22px rgba(255,59,92,.45)}
+.b-ok{background:linear-gradient(90deg,#14c26b,var(--cyan));color:#02140c;box-shadow:0 0 22px rgba(45,255,154,.45)}
+.b-ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+.btn.pulse:not(:disabled){animation:pulse 1.6s infinite}
+@keyframes pulse{50%{box-shadow:0 0 34px rgba(39,230,255,.8)}}
+.file{display:flex;gap:12px;align-items:center}
+.file svg{width:46px;height:46px;flex:none;color:var(--green);filter:drop-shadow(0 0 8px var(--green))}
+.file small{color:var(--mut)}
+.tag{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--cyan);margin:6px 6px 0 0}
+/* progreso */
+.pg{margin-bottom:14px}
+.pg-top{display:flex;justify-content:space-between;font-weight:700;margin-bottom:8px;font-size:.92rem}
+.bar{height:12px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--cyan),var(--purple),var(--red));box-shadow:0 0 14px var(--cyan);transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.dots{display:flex;gap:6px;margin-top:10px}
+.dots span{flex:1;height:8px;border-radius:6px;background:rgba(255,255,255,.12);transition:.4s}
+.dots .done{background:var(--green);box-shadow:0 0 10px var(--green)}
+.dots .cur{background:var(--orange);box-shadow:0 0 10px var(--orange)}
+/* anuncio + timer */
+.adslot{min-height:90px;border:1px dashed var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:.8rem;margin:12px 0;text-align:center;padding:8px}
+.timer{display:flex;align-items:center;gap:14px;justify-content:center;margin:12px 0 2px}
+.ring{width:84px;height:84px;position:relative}
+.ring svg{transform:rotate(-90deg);width:100%;height:100%}
+.ring circle{fill:none;stroke-width:8}
+.ring .t{stroke:rgba(255,255,255,.12)}
+.ring .p{stroke:var(--cyan);stroke-linecap:round;stroke-dasharray:226;stroke-dashoffset:0;transition:stroke-dashoffset .25s linear;filter:drop-shadow(0 0 5px var(--cyan))}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:1.6rem}
+.status{text-align:center;font-weight:600;min-height:1.4em;color:var(--cyan);font-size:.92rem}
+.note{font-size:.78rem;color:var(--mut);text-align:center;margin-top:10px}
+.floatwa{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:5;width:56px;height:56px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 0 22px rgba(37,211,102,.7)}
+.floatwa svg{width:30px;height:30px;fill:#fff}
+/* modal */
+.ov{position:fixed;inset:0;z-index:20;background:rgba(3,4,12,.78);display:none;align-items:center;justify-content:center;padding:18px}
+.ov.on{display:flex;animation:in .25s ease both}
+.modal{max-width:400px;width:100%;background:#10142a;border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 0 40px rgba(155,77,255,.4)}
+.modal h2{text-align:center;font-size:1.3rem;margin-bottom:8px}
+.modal p{text-align:center}
+.burst{font-size:3rem;text-align:center}
+.hide{display:none!important}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}#particles{display:none}}
+</style>
+</head>
+<body>
+<canvas id="particles" aria-hidden="true"></canvas>
+<main>
+  <div class="brand">
+    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 3 43 14v20L24 45 5 34V14z" stroke="#27e6ff" stroke-width="3"/><path d="M17 15v18m0-9 12-9m-12 9 12 9" stroke="#ff3b5c" stroke-width="3.5" stroke-linecap="round"/></svg>
+    <b id="siteName">KENDY MODS</b>
+  </div>
+
+  <!-- ===== BIENVENIDA ===== -->
+  <section class="screen on" id="sWelcome">
+    <h1>DESBLOQUEA TU DESCARGA</h1>
+    <p class="center" style="margin-bottom:14px">Completa <b id="nStagesTxt">6</b> etapas consecutivas para acceder al archivo.</p>
+    <div class="card file">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3"/></svg>
+      <div><b id="fName"></b><br><small id="fDesc"></small><br><span class="tag" id="fVer"></span><span class="tag" id="fSize"></span></div>
+    </div>
+    <div class="card pg"><div class="pg-top"><span>Progreso</span><span>0/6 · 0%</span></div><div class="bar"><i></i></div></div>
+    <button class="btn b-main pulse" id="btnStart">COMENZAR</button>
+    <p class="note">Al comenzar se abrirá nuestro canal de WhatsApp en una pestaña nueva. En cada etapa verás un anuncio; el botón CONTINUAR se habilita al terminar las cuentas regresivas.</p>
+  </section>
+
+  <!-- ===== ETAPAS ===== -->
+  <section class="screen" id="sStage">
+    <div class="card pg">
+      <div class="pg-top"><span id="pgStage">Etapa 1/6</span><span id="pgTxt">0/6 · 0%</span></div>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="pgBar"><i id="pgFill"></i></div>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div class="card">
+      <h2 id="stTitle"></h2>
+      <p id="stText"></p>
+      <div class="adslot" id="adSlot">Espacio publicitario</div>
+      <div class="timer"><div class="ring"><svg viewBox="0 0 80 80"><circle class="t" cx="40" cy="40" r="36"/><circle class="p" id="ringP" cx="40" cy="40" r="36"/></svg><b id="tNum">–</b></div></div>
+      <div class="status" id="status" aria-live="polite"></div>
+      <button class="btn b-ad" id="btnAd">VER ANUNCIO</button>
+      <button class="btn b-main hide" id="btnPhase2">INICIAR SEGUNDA FASE</button>
+      <button class="btn b-ok" id="btnNext" disabled>CONTINUAR</button>
+      <p class="note" id="stNote"></p>
+    </div>
+  </section>
+
+  <!-- ===== FINAL ===== -->
+  <section class="screen" id="sDone">
+    <div class="burst" aria-hidden="true">🎉</div>
+    <h1>¡DESCARGA DESBLOQUEADA!</h1>
+    <p class="center" style="margin-bottom:14px">Has completado las seis etapas. Ya puedes acceder a tu archivo.</p>
+    <div class="card pg"><div class="pg-top"><span>Progreso</span><span>6/6 · 100%</span></div><div class="bar"><i style="width:100%"></i></div></div>
+    <div class="card file">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3"/></svg>
+      <div><b id="dName"></b><br><small id="dDesc"></small><br><span class="tag" id="dVer"></span><span class="tag" id="dSize"></span></div>
+    </div>
+    <button class="btn b-ok pulse" id="btnDl">DESCARGAR AHORA</button>
+    <button class="btn b-ghost" id="btnRestart">VOLVER A COMENZAR</button>
+    <a class="btn b-ghost" id="lnkWa" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">CANAL DE WHATSAPP</a>
+  </section>
+</main>
+
+<a class="floatwa" id="fabWa" target="_blank" rel="noopener noreferrer" aria-label="Canal de WhatsApp"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.8-.1 1.4Z"/></svg></a>
+
+<!-- ===== MODALES ===== -->
+<div class="ov" id="mWa" role="dialog" aria-modal="true" aria-labelledby="mWaT"><div class="modal">
+  <h2 id="mWaT">Abre el canal manualmente</h2><p>Tu navegador bloqueó la pestaña nueva.</p>
+  <a class="btn b-ok" id="mWaGo" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">ABRIR WHATSAPP</a>
+  <button class="btn b-ghost" data-close>CERRAR</button></div></div>
+
+<div class="ov" id="mAdblock" role="alertdialog" aria-modal="true" aria-labelledby="mAbT"><div class="modal">
+  <h2 id="mAbT">PUBLICIDAD BLOQUEADA</h2>
+  <p>Parece que la publicidad no se está cargando. Desactiva el bloqueador de anuncios para continuar o comprueba tu conexión.</p>
+  <button class="btn b-main" id="btnRecheck">VOLVER A COMPROBAR</button>
+  <button class="btn b-ghost" data-close>CERRAR</button></div></div>
+
+<div class="ov" id="mErr" role="alertdialog" aria-modal="true" aria-labelledby="mErrT"><div class="modal">
+  <h2 id="mErrT">Algo falló</h2><p id="mErrP"></p>
+  <button class="btn b-main" id="btnErrRetry">REINTENTAR</button>
+  <button class="btn b-ghost" data-close>CERRAR</button></div></div>
+
+<div class="ov" id="mStage" role="dialog" aria-modal="true" aria-labelledby="mStT"><div class="modal">
+  <div class="burst" aria-hidden="true">✅</div><h2 id="mStT">¡Etapa completada!</h2><p id="mStP"></p>
+  <button class="btn b-ok" id="btnStageOk">SIGUIENTE ETAPA</button></div></div>
+
+<div class="ov" id="mExit" role="dialog" aria-modal="true" aria-labelledby="mExT"><div class="modal">
+  <h2 id="mExT">¿Reiniciar el proceso?</h2><p>Perderás tu progreso actual y volverás a la pantalla inicial.</p>
+  <button class="btn b-ad" id="btnExitYes">SÍ, REINICIAR</button>
+  <button class="btn b-ghost" data-close>SEGUIR AQUÍ</button></div></div>
+
+<script>
+/* =====================================================================
+   CONFIGURACIÓN — edita solo este bloque
+   ===================================================================== */
+const CONFIG = {
+  siteName: "KENDY MODS",
+  whatsappUrl: "https://whatsapp.com/channel/0029Vb9K8MS6xCSIyFjwCv40", // canal de WhatsApp
+  youtubeUrl:  "https://youtube.com/@kendymods?si=2CoZ_dAt9j_QMCiT",    // (opcional, se muestra en la última etapa)
+  downloadUrl: "PEGA_AQUI_TU_URL_DE_DESCARGA",   // <-- EDITAR: enlace real del archivo (p. ej. MediaFire)
+  fileName: "Nombre del archivo (EDITAR)",
+  version: "v1.0",
+  size: "0 MB",
+  description: "Descripción del archivo (EDITAR)",
+  stages: 6,
+  phase1Seconds: 5,    // primera cuenta regresiva
+  phase2Seconds: 15,   // segunda cuenta regresiva
+  autoAds: true,       // anuncios automáticos ON/OFF
+  adScriptUrl: "https://al5sm.com/tag.min.js", // script del proveedor (cámbialo por el oficial de tu proveedor)
+  adScriptAttrs: { "data-zone": "12014639", "data-cfasync": "false" },
+  adClickUrl: "",      // enlace del anuncio activado por el usuario (deja "" para no abrir nada)
+  storageKey: "kendy_progress_v1",
+  resetAfterHiddenSeconds: 0 // 0 = no reiniciar al salir de la página
+};
+/* NOTA SOBRE ANUNCIOS: el cliente solo puede verificar interacción y tiempo
+   transcurrido. NO prueba que haya habido una impresión publicitaria válida; eso
+   solo puede confirmarlo el proveedor con su propia señal/postback (backend).
+   Cualquier lógica del lado del cliente puede ser manipulada por el usuario. */
+
+/* ---------- Utilidades ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const STAGE_TEXT = [
+  ["Sigue nuestro canal", "Lee las instrucciones y apoya al canal para mantener los mods gratis."],
+  ["Mira el anuncio", "Los anuncios nos permiten seguir publicando contenido gratuito."],
+  ["Mantente en la página", "No cierres esta pestaña durante las cuentas regresivas."],
+  ["Casi a la mitad", "Sigue el proceso; cada etapa es igual a la anterior."],
+  ["Ya falta poco", "Dos etapas más y tu archivo estará listo."],
+  ["Última etapa", "Termina esta etapa para desbloquear el archivo."]
+];
+
+/* ---------- Estado ---------- */
+// status: pendiente | iniciada | temporizando | completada
+let S = { done: 0, status: "pendiente", phase: 0, started: false };
+let timerId = null, busy = false, adBlockedFlag = false;
+let tLeft = 0, tTotal = 0, lastTick = 0;
+
+function save(){ try{ sessionStorage.setItem(CONFIG.storageKey, JSON.stringify({done:S.done,started:S.started})); }catch(e){} }
+function load(){
+  try{
+    const d = JSON.parse(sessionStorage.getItem(CONFIG.storageKey)||"null");
+    if(d && Number.isInteger(d.done) && d.done>=0 && d.done<=CONFIG.stages){ S.done=d.done; S.started=!!d.started; }
+  }catch(e){}
+}
+function clearTimer(){ if(timerId){ clearInterval(timerId); timerId=null; } }
+
+/* ---------- Pantallas ---------- */
+function show(id){
+  $$(".screen").forEach(s=>s.classList.remove("on"));
+  const el = $("#"+id); el.classList.add("on");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function openM(id){ $(id).classList.add("on"); const b=$(id).querySelector(".btn"); if(b) b.focus(); }
+function closeM(id){ $(id).classList.remove("on"); }
+$$("[data-close]").forEach(b=>b.addEventListener("click",()=>b.closest(".ov").classList.remove("on")));
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") $$(".ov.on").forEach(o=>o.classList.remove("on")); });
+
+/* ---------- Progreso ---------- */
+function pct(n){ return Math.round(n/CONFIG.stages*10000)/100; }
+function fmt(n){ return String(pct(n)).replace(".",",")+"%"; }
+function renderProgress(){
+  const p = pct(S.done);
+  $("#pgFill").style.width = p+"%";
+  $("#pgBar").setAttribute("aria-valuenow", Math.round(p));
+  $("#pgTxt").textContent = S.done+"/"+CONFIG.stages+" · "+fmt(S.done);
+  $("#pgStage").textContent = "Etapa "+Math.min(S.done+1,CONFIG.stages)+"/"+CONFIG.stages;
+  $("#dots").innerHTML = Array.from({length:CONFIG.stages},(_,i)=>
+    `<span class="${i<S.done?"done":i===S.done?"cur":""}"></span>`).join("");
+}
+
+/* ---------- Anuncios automáticos (se cargan UNA sola vez) ---------- */
+let adScriptState = "idle"; // idle | loading | ok | error
+function loadAutoAds(){
+  return new Promise(res=>{
+    if(!CONFIG.autoAds){ adScriptState="ok"; return res("off"); }
+    if(adScriptState==="ok") return res("ok");
+    if(adScriptState==="loading") return res("loading");
+    adScriptState="loading";
+    const s=document.createElement("script");
+    s.src=CONFIG.adScriptUrl+(CONFIG._bust?("?r="+Date.now()):""); s.async=true;
+    Object.entries(CONFIG.adScriptAttrs||{}).forEach(([k,v])=>s.setAttribute(k,v));
+    s.onload=()=>{ adScriptState="ok"; res("ok"); };
+    s.onerror=()=>{ adScriptState="error"; res("error"); };
+    document.head.appendChild(s);
+  });
+}
+
+/* ---------- Detector de bloqueo (razonable, con recuperación) ---------- */
+async function checkAds(){
+  if(!CONFIG.autoAds) return "ok";
+  // 1) Elemento cebo: los filtros cosméticos suelen ocultarlo.
+  const bait=document.createElement("div");
+  bait.className="adsbox ad-banner pub_300x250 text-ad";
+  bait.style.cssText="position:absolute;left:-9999px;height:10px;width:10px";
+  document.body.appendChild(bait); await new Promise(r=>setTimeout(r,120));
+  const hiddenBait = bait.offsetHeight===0 || getComputedStyle(bait).display==="none";
+  bait.remove();
+  // 2) Carga del script del proveedor.
+  if(adScriptState==="error"){ CONFIG._bust=true; adScriptState="idle"; }
+  const r = await loadAutoAds();
+  const scriptFail = r==="error";
+  if(!navigator.onLine) return "offline";   // sin conexión: NO es bloqueo confirmado
+  if(scriptFail || hiddenBait) return "suspected"; // señal, no certeza
+  return "ok";
+}
+async function guardAds(){
+  const r = await checkAds();
+  if(r==="ok") return true;
+  adBlockedFlag=true;
+  openM("#mAdblock");
+  return false;
+}
+$("#btnRecheck").addEventListener("click", async ()=>{
+  const b=$("#btnRecheck"); b.disabled=true; b.textContent="COMPROBANDO…";
+  const r=await checkAds();
+  b.disabled=false; b.textContent="VOLVER A COMPROBAR";
+  if(r==="ok"){ adBlockedFlag=false; closeM("#mAdblock"); }
+  else if(r==="offline"){ $("#mAdblock p").textContent="No hay conexión a internet. Revísala e inténtalo de nuevo."; }
+  else { $("#mAdblock p").textContent="Parece que la publicidad no se está cargando. Desactiva el bloqueador de anuncios para continuar o comprueba tu conexión."; }
+});
+
+/* ---------- WhatsApp ---------- */
+function isPlaceholder(u){ return !u || /PEGA_AQUI/i.test(u); }
+function openWhatsapp(){
+  if(isPlaceholder(CONFIG.whatsappUrl)){ return; }
+  const w=window.open(CONFIG.whatsappUrl,"_blank","noopener,noreferrer");
+  if(!w){ $("#mWaGo").href=CONFIG.whatsappUrl; openM("#mWa"); }
+}
+
+/* ---------- Flujo de etapa ---------- */
+function setStatus(t){ $("#status").textContent=t; }
+function renderStage(){
+  const i=S.done, [t,x]=STAGE_TEXT[i%STAGE_TEXT.length];
+  $("#stTitle").textContent=t; $("#stText").textContent=x;
+  $("#stNote").textContent = i===CONFIG.stages-1 && CONFIG.youtubeUrl ? "Tip: visita también nuestro canal de YouTube." : "";
+  S.status="pendiente"; S.phase=0; clearTimer();
+  $("#btnAd").classList.remove("hide"); $("#btnAd").disabled=false;
+  $("#btnPhase2").classList.add("hide"); $("#btnNext").disabled=true;
+  $("#tNum").textContent="–"; $("#ringP").style.strokeDashoffset=0;
+  setStatus("Pulsa «VER ANUNCIO» para empezar.");
+  renderProgress();
+}
+function drawTimer(){
+  $("#tNum").textContent=Math.ceil(tLeft);
+  $("#ringP").style.strokeDashoffset=226*(1-tLeft/tTotal);
+}
+// El temporizador mide tiempo real transcurrido (performance.now) y solo cuenta con la página visible.
+function runTimer(sec,onEnd){
+  clearTimer(); tTotal=tLeft=sec; lastTick=performance.now(); drawTimer();
+  S.status="temporizando";
+  timerId=setInterval(()=>{
+    const now=performance.now(), dt=(now-lastTick)/1000; lastTick=now;
+    if(document.hidden||adBlockedFlag) return;   // pausa fuera de la página
+    tLeft=Math.max(0,tLeft-Math.min(dt,1));        // tope por tick: evita saltos
+    drawTimer();
+    if(tLeft<=0){ clearTimer(); onEnd(); }
+  },200);
+}
+$("#btnAd").addEventListener("click", async ()=>{
+  if(busy||S.status!=="pendiente") return; busy=true;
+  try{
+    if(!(await guardAds())) return;
+    S.status="iniciada"; $("#btnAd").disabled=true; setStatus("Anuncio iniciado…");
+    if(CONFIG.adClickUrl && !isPlaceholder(CONFIG.adClickUrl)){
+      const w=window.open(CONFIG.adClickUrl,"_blank","noopener,noreferrer");
+      if(!w) setStatus("Tu navegador bloqueó la pestaña. El tiempo corre igualmente.");
+    }
+    S.phase=1; setStatus("Fase 1: espera "+CONFIG.phase1Seconds+" segundos…");
+    runTimer(CONFIG.phase1Seconds,()=>{
+      S.phase=1.5; $("#btnAd").classList.add("hide");
+      $("#btnPhase2").classList.remove("hide"); $("#btnPhase2").classList.add("pulse");
+      $("#btnPhase2").textContent="INICIAR SEGUNDA FASE ("+CONFIG.phase2Seconds+"s)";
+      $("#tNum").textContent="✓"; setStatus("Fase 1 completada.");
+    });
+  } finally { busy=false; }
+});
+$("#btnPhase2").addEventListener("click", ()=>{
+  if(busy||S.phase!==1.5) return; busy=true;
+  S.phase=2; $("#btnPhase2").classList.add("hide");
+  setStatus("Fase 2: espera "+CONFIG.phase2Seconds+" segundos…");
+  runTimer(CONFIG.phase2Seconds,()=>{
+    S.status="lista"; S.phase=3; $("#btnNext").disabled=false; $("#btnNext").classList.add("pulse");
+    $("#tNum").textContent="✓"; setStatus("¡Listo! Pulsa CONTINUAR.");
+  });
+  busy=false;
+});
+$("#btnNext").addEventListener("click", ()=>{
+  if(busy||S.phase!==3||S.status!=="lista") return; busy=true;   // anti doble pulsación
+  $("#btnNext").disabled=true; $("#btnNext").classList.remove("pulse");
+  S.status="completada"; S.done++; save(); renderProgress();
+  if(S.done>=CONFIG.stages){ busy=false; finish(); return; }
+  $("#mStP").textContent="Llevas "+S.done+"/"+CONFIG.stages+" ("+fmt(S.done)+").";
+  openM("#mStage"); busy=false;
+});
+$("#btnStageOk").addEventListener("click", ()=>{
+  if(!$("#mStage").classList.contains("on")) return;
+  closeM("#mStage"); renderStage();
+});
+
+/* ---------- Final ---------- */
+function finish(){
+  clearTimer(); fillFile(); show("sDone");
+}
+$("#btnDl").addEventListener("click", ()=>{
+  if(S.done<CONFIG.stages) return;
+  if(isPlaceholder(CONFIG.downloadUrl)){
+    $("#mErrP").textContent="El propietario aún no ha configurado la URL de descarga (CONFIG.downloadUrl).";
+    $("#btnErrRetry").classList.add("hide"); openM("#mErr"); return;
+  }
+  const w=window.open(CONFIG.downloadUrl,"_blank","noopener,noreferrer");
+  if(!w) location.href=CONFIG.downloadUrl;
+});
+$("#btnRestart").addEventListener("click", ()=>openM("#mExit"));
+$("#btnExitYes").addEventListener("click", ()=>{ closeM("#mExit"); resetAll(); });
+function resetAll(){
+  clearTimer(); S={done:0,status:"pendiente",phase:0,started:false}; save(); show("sWelcome");
+}
+
+/* ---------- Inicio ---------- */
+$("#btnStart").addEventListener("click", async ()=>{
+  if(busy) return; busy=true;
+  try{
+    openWhatsapp();
+    S.started=true; save();
+    await guardAds().then(()=>{});   // si hay bloqueo se muestra el modal, pero se puede reintentar
+    renderStage(); show("sStage");
+  } finally { busy=false; }
+});
+
+/* ---------- Datos del archivo ---------- */
+function fillFile(){
+  ["f","d"].forEach(p=>{
+    $("#"+p+"Name").textContent=CONFIG.fileName; $("#"+p+"Desc").textContent=CONFIG.description;
+    $("#"+p+"Ver").textContent=CONFIG.version; $("#"+p+"Size").textContent=CONFIG.size;
+  });
+}
+
+/* ---------- Partículas ligeras ---------- */
+function particles(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c=$("#particles"), x=c.getContext("2d"); let w,h;
+  const cols=["#2f6bff","#9b4dff","#ff3b5c","#2dff9a","#ff9a2e","#27e6ff"];
+  const P=Array.from({length:26},()=>({x:Math.random(),y:Math.random(),r:1+Math.random()*2,v:.0003+Math.random()*.0006,c:cols[Math.random()*6|0]}));
+  const rs=()=>{w=c.width=innerWidth;h=c.height=innerHeight}; rs(); addEventListener("resize",rs);
+  (function f(){ if(!document.hidden){ x.clearRect(0,0,w,h);
+    P.forEach(p=>{p.y-=p.v; if(p.y<0){p.y=1;p.x=Math.random()}
+      x.beginPath();x.fillStyle=p.c;x.globalAlpha=.55;x.arc(p.x*w,p.y*h,p.r,0,7);x.fill();}); }
+    requestAnimationFrame(f); })();
+}
+
+/* ---------- Arranque ---------- */
+function init(){
+  document.title=CONFIG.siteName+" · Desbloquea tu descarga";
+  $("#siteName").textContent=CONFIG.siteName;
+  $("#nStagesTxt").textContent=CONFIG.stages;
+  $("#lnkWa").href=$("#fabWa").href=CONFIG.whatsappUrl;
+  fillFile(); load(); particles();
+  // Enlace seguro: si no hay URL de WhatsApp válida, ocultar el botón flotante
+  if(isPlaceholder(CONFIG.whatsappUrl)){ $("#fabWa").classList.add("hide"); $("#lnkWa").classList.add("hide"); }
+  if(S.done>=CONFIG.stages){ finish(); }
+  else if(S.started){ renderStage(); show("sStage"); }
+  // Carga única del script automático
+  loadAutoAds();
+  // Si pierden conexión / recuperan, no se marca bloqueo automáticamente.
+  if(CONFIG.resetAfterHiddenSeconds>0){
+    let hiddenAt=0;
+    document.addEventListener("visibilitychange",()=>{
+      if(document.hidden) hiddenAt=Date.now();
+      else if(hiddenAt && (Date.now()-hiddenAt)/1000>=CONFIG.resetAfterHiddenSeconds){ resetAll(); }
+    });
+  }
+}
+init();
+</script>
+</body>
+</html>
