@@ -69,6 +69,11 @@ p{color:var(--mut);font-size:.95rem}
 .adslot.busy{cursor:default;border-color:var(--orange);animation:pulse 1.6s infinite}
 .adslot.busy .play,.adslot.done .play{display:none}
 .adslot.done{cursor:default;border-color:var(--green);box-shadow:0 0 26px rgba(45,255,154,.45)}
+.soc{display:block;width:100%;min-height:58px;border-radius:16px;margin-top:12px;padding:14px 16px;text-align:center;text-decoration:none;font-weight:800;color:#fff;letter-spacing:.03em;border:2px solid transparent}
+.soc.lock{background:rgba(255,255,255,.08);color:var(--mut);pointer-events:none;filter:grayscale(1)}
+.soc.now{background:linear-gradient(90deg,var(--blue),var(--purple));box-shadow:0 0 22px rgba(47,107,255,.6);animation:pulse 1.6s infinite}
+.soc.wait{background:linear-gradient(90deg,var(--orange),var(--red))}
+.soc.ok{background:linear-gradient(90deg,#14c26b,var(--cyan));color:#02140c;pointer-events:none}
 .stick{position:sticky;top:8px;z-index:4;background:rgba(10,12,30,.92)}
 #sStage>.adslot{margin-top:0}
 .timer{display:flex;align-items:center;gap:14px;justify-content:center;margin:12px 0 2px}
@@ -123,6 +128,7 @@ p{color:var(--mut);font-size:.95rem}
     <div class="card">
       <h2 id="stTitle"></h2>
       <p id="stText"></p>
+      <div id="socialBox"></div>
       <div class="status" id="status" aria-live="polite"></div>
       <button class="btn b-main" id="btnPhase2" disabled>SEGUIR</button>
       <div class="timer hide" id="timerBox"><div class="ring"><svg viewBox="0 0 80 80"><circle class="t" cx="40" cy="40" r="36"/><circle class="p" id="ringP" cx="40" cy="40" r="36"/></svg><b id="tNum">–</b></div></div>
@@ -203,6 +209,7 @@ const CONFIG = {
     { src: "https://al5sm.com/tag.min.js",        zone: "12130485" },
     { src: "https://n6wxm.com/vignette.min.js",   zone: "12130495" }
   ],
+  minAwaySeconds: 2,   // tiempo mínimo fuera de la página para dar por visitado un enlace
   verifySeconds: 3,    // "Verificando…" oculto (no muestra números)
   storageKey: "kendy_progress_v1",
   resetAfterHiddenSeconds: 0 // 0 = no reiniciar al salir de la página
@@ -243,6 +250,7 @@ function clearTimer(){ if(timerId){ clearInterval(timerId); timerId=null; } }
 function show(id){
   $$(".screen").forEach(s=>s.classList.remove("on"));
   const el = $("#"+id); el.classList.add("on");
+  $(".social").classList.toggle("hide", id==="sStage" && S.done===0);
   window.scrollTo({top:0,behavior:"smooth"});
 }
 function openM(id){ $(id).classList.add("on"); const b=$(id).querySelector(".btn"); if(b) b.focus(); }
@@ -334,11 +342,60 @@ function renderStage(){
   $("#btnNext").classList.add("hide"); $("#btnNext").classList.remove("pulse"); $("#btnNext").disabled=true;
   $("#timerBox").classList.add("hide");
   $("#tNum").textContent="–"; $("#ringP").style.strokeDashoffset=0;
-  setStatus("Verificando…");
+  $(".social").classList.toggle("hide", i===0);
+  $("#socialBox").innerHTML=""; pendingLink=-1; socialIdx=0; socialList=[];
   renderProgress();
-  // La verificación (3 s, sin mostrar números) arranca sola al entrar a cada etapa
-  guardAds().then(ok=>{ if(ok) startVerify(); });
+  if(i===0){
+    // ETAPA 1: visitar Grupo -> Canal -> Discord (se detecta que entró y salió de cada uno)
+    $("#btnPhase2").classList.add("hide");
+    setupSocial(); guardAds();
+  } else {
+    setStatus("Verificando…");
+    // La verificación (3 s, sin mostrar números) arranca sola al entrar a cada etapa
+    guardAds().then(ok=>{ if(ok) startVerify(); });
+  }
 }
+/* ---------- Etapa 1: botones de comunidad ----------
+   Solo se puede comprobar que la persona ABRIÓ el enlace y VOLVIÓ a esta página.
+   No se puede saber si de verdad se unió o siguió. */
+let socialIdx=0, pendingLink=-1, leftSoc=false, leftAt=0, socialList=[];
+function setupSocial(){
+  const defs=[
+    {label:"1. UNIRME AL GRUPO DE WHATSAPP", ok:"✓ GRUPO VISITADO",  url:CONFIG.whatsappGroupUrl},
+    {label:"2. ABRIR EL CANAL DE WHATSAPP",  ok:"✓ CANAL VISITADO",  url:CONFIG.whatsappUrl},
+    {label:"3. ENTRAR A DISCORD",            ok:"✓ DISCORD VISITADO", url:CONFIG.discordUrl}
+  ].filter(d=>!isPlaceholder(d.url));
+  const box=$("#socialBox"); socialList=[];
+  defs.forEach((d,k)=>{
+    const a=document.createElement("a");
+    a.className="soc "+(k===0?"now":"lock"); a.textContent=d.label; a.dataset.ok=d.ok;
+    a.href=d.url; a.target="_blank"; a.rel="noopener noreferrer";
+    a.addEventListener("click",()=>{ if(k!==socialIdx) return; pendingLink=k; leftSoc=false; a.className="soc wait"; setStatus("Entra al enlace y vuelve aquí."); });
+    box.appendChild(a); socialList.push(a);
+  });
+  if(!defs.length){ finishSocial(); return; }
+  setStatus("Toca los botones en orden. Entra a cada enlace y regresa.");
+}
+function finishSocial(){
+  S.phase=3; S.status="lista";
+  $("#btnNext").classList.remove("hide"); $("#btnNext").disabled=false; $("#btnNext").classList.add("pulse");
+  setStatus("¡Listo! Pulsa CONTINUAR.");
+}
+function socLeave(){ if(pendingLink>=0){ leftSoc=true; leftAt=Date.now(); } }
+function socBack(){
+  if(pendingLink<0 || !leftSoc) return;
+  const k=pendingLink;
+  if(Date.now()-leftAt < CONFIG.minAwaySeconds*1000){   // volvió demasiado rápido: que lo intente otra vez
+    pendingLink=-1; leftSoc=false; socialList[k].className="soc now"; setStatus("Quédate un momento en el enlace y vuelve a intentarlo."); return;
+  }
+  pendingLink=-1; leftSoc=false;
+  socialList[k].className="soc ok"; socialList[k].textContent=socialList[k].dataset.ok;
+  socialIdx=k+1;
+  if(socialIdx<socialList.length){ socialList[socialIdx].className="soc now"; setStatus("¡Bien! Ahora el siguiente botón."); }
+  else finishSocial();
+}
+document.addEventListener("visibilitychange",()=>{ document.hidden?socLeave():socBack(); });
+window.addEventListener("blur",socLeave); window.addEventListener("focus",socBack);
 function drawTimer(){
   if(silent) return;
   $("#tNum").textContent=Math.ceil(tLeft);
