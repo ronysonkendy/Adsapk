@@ -413,10 +413,13 @@ function socBack(){
   if(pendingLink<0 || !leftSoc || document.hidden || verifying || returnHandled) return;
   const elapsed=(Date.now()-leftAt)/1000;
   if(elapsed < CONFIG.minAwaySeconds){
+    // En algunos navegadores Android se dispara focus antes de que termine
+    // de abrirse la pestaña externa. No cancelamos el intento: esperamos a
+    // que se cumpla el mínimo desde la primera detección de salida.
+    const faltan=Math.ceil(CONFIG.minAwaySeconds-elapsed);
     const a=socialList[pendingLink];
-    pendingLink=-1; leftSoc=false; returnHandled=false; stopPoll();
-    if(a){ a.className="soc now"; a.textContent=a.dataset.label; }
-    setStatus("Volviste demasiado rápido. Toca el botón e inténtalo otra vez, esperando más de 2 segundos fuera.");
+    if(a){ a.className="soc wait"; a.textContent="ESPERANDO…"; }
+    setStatus("Regreso detectado. Espera "+faltan+" segundo(s) para verificar.");
     return;
   }
   returnHandled=true;
