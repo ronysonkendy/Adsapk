@@ -57,7 +57,17 @@ p{color:var(--mut);font-size:.95rem}
 .dots .done{background:var(--green);box-shadow:0 0 10px var(--green)}
 .dots .cur{background:var(--orange);box-shadow:0 0 10px var(--orange)}
 /* anuncio + timer */
-.adslot{min-height:90px;border:1px dashed var(--line);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:.8rem;margin:12px 0;text-align:center;padding:8px}
+.adslot{min-height:170px;border:2px solid var(--cyan);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--txt);font-weight:800;letter-spacing:.04em;margin:14px 0;text-align:center;padding:14px;cursor:pointer;background:linear-gradient(135deg,rgba(47,107,255,.25),rgba(155,77,255,.25));box-shadow:0 0 26px rgba(39,230,255,.45),inset 0 0 24px rgba(155,77,255,.25);user-select:none;transition:transform .12s}
+.adslot:active{transform:scale(.98)}
+.adslot:focus-visible{outline:3px solid var(--orange);outline-offset:3px}
+.adslot .play{width:58px;height:58px;border-radius:50%;background:linear-gradient(90deg,var(--orange),var(--red));display:grid;place-items:center;box-shadow:0 0 20px rgba(255,59,92,.6)}
+.adslot .play svg{width:26px;height:26px;fill:#fff;margin-left:3px}
+.adslot.busy{cursor:default;border-color:var(--orange);animation:pulse 1.6s infinite}
+.adslot.busy .play,.adslot.done .play{display:none}
+.adslot.done{cursor:default;border-color:var(--green);box-shadow:0 0 26px rgba(45,255,154,.45)}
+#btnAd{display:none!important}
+.stick{position:sticky;top:8px;z-index:4;background:rgba(10,12,30,.92)}
+#sStage>.adslot{margin-top:0}
 .timer{display:flex;align-items:center;gap:14px;justify-content:center;margin:12px 0 2px}
 .ring{width:84px;height:84px;position:relative}
 .ring svg{transform:rotate(-90deg);width:100%;height:100%}
@@ -92,10 +102,6 @@ p{color:var(--mut);font-size:.95rem}
   <section class="screen on" id="sWelcome">
     <h1>DESBLOQUEA TU DESCARGA</h1>
     <p class="center" style="margin-bottom:14px">Completa <b id="nStagesTxt">6</b> etapas consecutivas para acceder al archivo.</p>
-    <div class="card file">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3"/></svg>
-      <div><b id="fName"></b><br><small id="fDesc"></small><br><span class="tag" id="fVer"></span><span class="tag" id="fSize"></span></div>
-    </div>
     <div class="card pg"><div class="pg-top"><span>Progreso</span><span>0/6 · 0%</span></div><div class="bar"><i></i></div></div>
     <button class="btn b-main pulse" id="btnStart">COMENZAR</button>
     <p class="note">Al comenzar se abrirá nuestro canal de WhatsApp en una pestaña nueva. En cada etapa verás un anuncio; el botón CONTINUAR se habilita al terminar las cuentas regresivas.</p>
@@ -103,20 +109,20 @@ p{color:var(--mut);font-size:.95rem}
 
   <!-- ===== ETAPAS ===== -->
   <section class="screen" id="sStage">
-    <div class="card pg">
+    <div class="card pg stick">
       <div class="pg-top"><span id="pgStage">Etapa 1/6</span><span id="pgTxt">0/6 · 0%</span></div>
       <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="pgBar"><i id="pgFill"></i></div>
       <div class="dots" id="dots"></div>
     </div>
+    <div class="adslot" id="adSlot" role="button" tabindex="0" aria-label="Ventana de anuncio: tócala para iniciar"><div class="play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3v18l16-9z"/></svg></div><span id="adTxt">TOCA AQUÍ PARA VER EL ANUNCIO</span></div>
     <div class="card">
       <h2 id="stTitle"></h2>
       <p id="stText"></p>
-      <div class="adslot" id="adSlot">Espacio publicitario</div>
-      <div class="timer"><div class="ring"><svg viewBox="0 0 80 80"><circle class="t" cx="40" cy="40" r="36"/><circle class="p" id="ringP" cx="40" cy="40" r="36"/></svg><b id="tNum">–</b></div></div>
       <div class="status" id="status" aria-live="polite"></div>
       <button class="btn b-ad" id="btnAd">VER ANUNCIO</button>
-      <button class="btn b-main hide" id="btnPhase2">INICIAR SEGUNDA FASE</button>
-      <button class="btn b-ok" id="btnNext" disabled>CONTINUAR</button>
+      <button class="btn b-main" id="btnPhase2" disabled>SEGUIR</button>
+      <div class="timer hide" id="timerBox"><div class="ring"><svg viewBox="0 0 80 80"><circle class="t" cx="40" cy="40" r="36"/><circle class="p" id="ringP" cx="40" cy="40" r="36"/></svg><b id="tNum">–</b></div></div>
+      <button class="btn b-ok hide" id="btnNext" disabled>CONTINUAR</button>
       <p class="note" id="stNote"></p>
     </div>
   </section>
@@ -127,10 +133,6 @@ p{color:var(--mut);font-size:.95rem}
     <h1>¡DESCARGA DESBLOQUEADA!</h1>
     <p class="center" style="margin-bottom:14px">Has completado las seis etapas. Ya puedes acceder a tu archivo.</p>
     <div class="card pg"><div class="pg-top"><span>Progreso</span><span>6/6 · 100%</span></div><div class="bar"><i style="width:100%"></i></div></div>
-    <div class="card file">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v3h16v-3"/></svg>
-      <div><b id="dName"></b><br><small id="dDesc"></small><br><span class="tag" id="dVer"></span><span class="tag" id="dSize"></span></div>
-    </div>
     <button class="btn b-ok pulse" id="btnDl">DESCARGAR AHORA</button>
     <button class="btn b-ghost" id="btnRestart">VOLVER A COMENZAR</button>
     <a class="btn b-ghost" id="lnkWa" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">CANAL DE WHATSAPP</a>
@@ -182,8 +184,11 @@ const CONFIG = {
   phase1Seconds: 5,    // primera cuenta regresiva
   phase2Seconds: 15,   // segunda cuenta regresiva
   autoAds: true,       // anuncios automáticos ON/OFF
-  adScriptUrl: "https://al5sm.com/tag.min.js", // script del proveedor (cámbialo por el oficial de tu proveedor)
-  adScriptAttrs: { "data-zone": "12014639", "data-cfasync": "false" },
+  adScripts: [   // scripts del proveedor (se cargan una sola vez)
+    { src: "https://al5sm.com/tag.min.js",        zone: "12130485" },
+    { src: "https://n6wxm.com/vignette.min.js",   zone: "12130495" }
+  ],
+  verifySeconds: 3,    // "Verificando…" oculto (no muestra números)
   adClickUrl: "",      // enlace del anuncio activado por el usuario (deja "" para no abrir nada)
   storageKey: "kendy_progress_v1",
   resetAfterHiddenSeconds: 0 // 0 = no reiniciar al salir de la página
@@ -209,7 +214,7 @@ const STAGE_TEXT = [
 // status: pendiente | iniciada | temporizando | completada
 let S = { done: 0, status: "pendiente", phase: 0, started: false };
 let timerId = null, busy = false, adBlockedFlag = false;
-let tLeft = 0, tTotal = 0, lastTick = 0;
+let tLeft = 0, tTotal = 0, lastTick = 0, silent = false;
 
 function save(){ try{ sessionStorage.setItem(CONFIG.storageKey, JSON.stringify({done:S.done,started:S.started})); }catch(e){} }
 function load(){
@@ -252,12 +257,14 @@ function loadAutoAds(){
     if(adScriptState==="ok") return res("ok");
     if(adScriptState==="loading") return res("loading");
     adScriptState="loading";
-    const s=document.createElement("script");
-    s.src=CONFIG.adScriptUrl+(CONFIG._bust?("?r="+Date.now()):""); s.async=true;
-    Object.entries(CONFIG.adScriptAttrs||{}).forEach(([k,v])=>s.setAttribute(k,v));
-    s.onload=()=>{ adScriptState="ok"; res("ok"); };
-    s.onerror=()=>{ adScriptState="error"; res("error"); };
-    document.head.appendChild(s);
+    let pend=CONFIG.adScripts.length, failed=false;
+    const fin=()=>{ if(--pend>0) return; adScriptState=failed?"error":"ok"; res(failed?"error":"ok"); };
+    CONFIG.adScripts.forEach(a=>{
+      const s=document.createElement("script");
+      s.dataset.zone=a.zone; s.src=a.src;
+      s.onload=fin; s.onerror=()=>{ failed=true; fin(); };
+      (document.body||document.documentElement).appendChild(s);
+    });
   });
 }
 
@@ -272,7 +279,7 @@ async function checkAds(){
   const hiddenBait = bait.offsetHeight===0 || getComputedStyle(bait).display==="none";
   bait.remove();
   // 2) Carga del script del proveedor.
-  if(adScriptState==="error"){ CONFIG._bust=true; adScriptState="idle"; }
+  if(adScriptState==="error"){ adScriptState="idle"; }
   const r = await loadAutoAds();
   const scriptFail = r==="error";
   if(!navigator.onLine) return "offline";   // sin conexión: NO es bloqueo confirmado
@@ -310,19 +317,23 @@ function renderStage(){
   $("#stTitle").textContent=t; $("#stText").textContent=x;
   $("#stNote").textContent = i===CONFIG.stages-1 && CONFIG.youtubeUrl ? "Tip: visita también nuestro canal de YouTube." : "";
   S.status="pendiente"; S.phase=0; clearTimer();
-  $("#btnAd").classList.remove("hide"); $("#btnAd").disabled=false;
-  $("#btnPhase2").classList.add("hide"); $("#btnNext").disabled=true;
+  $("#btnAd").disabled=false;
+  $("#btnPhase2").classList.remove("hide","pulse"); $("#btnPhase2").disabled=true; $("#btnPhase2").textContent="SEGUIR";
+  $("#btnNext").classList.add("hide"); $("#btnNext").classList.remove("pulse"); $("#btnNext").disabled=true;
+  $("#timerBox").classList.add("hide");
   $("#tNum").textContent="–"; $("#ringP").style.strokeDashoffset=0;
-  setStatus("Pulsa «VER ANUNCIO» para empezar.");
+  $("#adSlot").className="adslot"; $("#adTxt").textContent="TOCA AQUÍ PARA VER EL ANUNCIO";
+  setStatus("Toca la ventana del anuncio para empezar.");
   renderProgress();
 }
 function drawTimer(){
+  if(silent) return;
   $("#tNum").textContent=Math.ceil(tLeft);
   $("#ringP").style.strokeDashoffset=226*(1-tLeft/tTotal);
 }
 // El temporizador mide tiempo real transcurrido (performance.now) y solo cuenta con la página visible.
-function runTimer(sec,onEnd){
-  clearTimer(); tTotal=tLeft=sec; lastTick=performance.now(); drawTimer();
+function runTimer(sec,onEnd,quiet){
+  clearTimer(); silent=!!quiet; tTotal=tLeft=sec; lastTick=performance.now(); drawTimer();
   S.status="temporizando";
   timerId=setInterval(()=>{
     const now=performance.now(), dt=(now-lastTick)/1000; lastTick=now;
@@ -337,25 +348,29 @@ $("#btnAd").addEventListener("click", async ()=>{
   try{
     if(!(await guardAds())) return;
     S.status="iniciada"; $("#btnAd").disabled=true; setStatus("Anuncio iniciado…");
+    $("#adSlot").className="adslot busy"; $("#adTxt").textContent="Anuncio en curso…";
     if(CONFIG.adClickUrl && !isPlaceholder(CONFIG.adClickUrl)){
       const w=window.open(CONFIG.adClickUrl,"_blank","noopener,noreferrer");
       if(!w) setStatus("Tu navegador bloqueó la pestaña. El tiempo corre igualmente.");
     }
-    S.phase=1; setStatus("Fase 1: espera "+CONFIG.phase1Seconds+" segundos…");
-    runTimer(CONFIG.phase1Seconds,()=>{
-      S.phase=1.5; $("#btnAd").classList.add("hide");
-      $("#btnPhase2").classList.remove("hide"); $("#btnPhase2").classList.add("pulse");
-      $("#btnPhase2").textContent="INICIAR SEGUNDA FASE ("+CONFIG.phase2Seconds+"s)";
-      $("#tNum").textContent="✓"; setStatus("Fase 1 completada.");
-    });
+    S.phase=0.5; $("#adTxt").textContent="Verificando…"; setStatus("");   // 3 s sin mostrar cuenta
+    runTimer(CONFIG.verifySeconds,()=>{
+      S.phase=1.5; silent=false;
+      $("#adSlot").className="adslot done"; $("#adTxt").textContent="Listo";
+      $("#btnPhase2").disabled=false; $("#btnPhase2").classList.add("pulse");
+      setStatus("Botón habilitado. Pulsa SEGUIR.");
+    },true);
   } finally { busy=false; }
 });
+$("#adSlot").addEventListener("click",()=>{ if(S.status==="pendiente") $("#btnAd").click(); });
+$("#adSlot").addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); $("#adSlot").click(); } });
 $("#btnPhase2").addEventListener("click", ()=>{
   if(busy||S.phase!==1.5) return; busy=true;
-  S.phase=2; $("#btnPhase2").classList.add("hide");
-  setStatus("Fase 2: espera "+CONFIG.phase2Seconds+" segundos…");
+  S.phase=2; $("#btnPhase2").classList.add("hide"); $("#timerBox").classList.remove("hide");
+  setStatus("Espera "+CONFIG.phase2Seconds+" segundos…");
   runTimer(CONFIG.phase2Seconds,()=>{
-    S.status="lista"; S.phase=3; $("#btnNext").disabled=false; $("#btnNext").classList.add("pulse");
+    S.status="lista"; S.phase=3;
+    $("#btnNext").classList.remove("hide"); $("#btnNext").disabled=false; $("#btnNext").classList.add("pulse");
     $("#tNum").textContent="✓"; setStatus("¡Listo! Pulsa CONTINUAR.");
   });
   busy=false;
@@ -404,12 +419,7 @@ $("#btnStart").addEventListener("click", async ()=>{
 });
 
 /* ---------- Datos del archivo ---------- */
-function fillFile(){
-  ["f","d"].forEach(p=>{
-    $("#"+p+"Name").textContent=CONFIG.fileName; $("#"+p+"Desc").textContent=CONFIG.description;
-    $("#"+p+"Ver").textContent=CONFIG.version; $("#"+p+"Size").textContent=CONFIG.size;
-  });
-}
+function fillFile(){ /* sin tarjeta de archivo */ }
 
 /* ---------- Partículas ligeras ---------- */
 function particles(){
