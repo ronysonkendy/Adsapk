@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#070914">
+<link rel="preconnect" href="https://al5sm.com" crossorigin>
+<link rel="preconnect" href="https://n6wxm.com" crossorigin>
+<link rel="dns-prefetch" href="https://al5sm.com">
+<link rel="dns-prefetch" href="https://n6wxm.com">
 <title>KENDY MODS · Desbloquea tu descarga</title>
 <style>
 /* ===== VARIABLES (colores editables) ===== */
@@ -184,7 +188,7 @@ const CONFIG = {
   description: "Descripción del archivo (EDITAR)",
   stages: 6,
   phase1Seconds: 5,    // primera cuenta regresiva
-  phase2Seconds: 15,   // segunda cuenta regresiva
+  phase2Seconds: 10,   // segunda cuenta regresiva
   autoAds: true,       // anuncios automáticos ON/OFF
   adScripts: [   // scripts del proveedor (se cargan una sola vez)
     { src: "https://al5sm.com/tag.min.js",        zone: "12130485" },
@@ -257,10 +261,11 @@ function loadAutoAds(){
   adsLoaded=true;
   CONFIG.adScripts.forEach(a=>{
     const s=document.createElement("script");
-    s.dataset.zone=a.zone; s.src=a.src;
+    s.dataset.zone=a.zone; s.src=a.src; s.async=true;
     (document.body||document.documentElement).appendChild(s);
   });
 }
+loadAutoAds();   // se piden de inmediato, sin esperar al resto del arranque
 
 /* ---------- Detector de bloqueo (razonable, con recuperación) ----------
    No ejecuta los anuncios: solo comprueba si el recurso se puede pedir. */
