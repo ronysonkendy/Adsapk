@@ -77,8 +77,6 @@ p{color:var(--mut);font-size:.95rem}
 .ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:1.6rem}
 .status{text-align:center;font-weight:600;min-height:1.4em;color:var(--cyan);font-size:.92rem}
 .note{font-size:.78rem;color:var(--mut);text-align:center;margin-top:10px}
-.floatwa{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:5;width:56px;height:56px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 0 22px rgba(37,211,102,.7)}
-.floatwa svg{width:30px;height:30px;fill:#fff}
 /* modal */
 .ov{position:fixed;inset:0;z-index:20;background:rgba(3,4,12,.78);display:none;align-items:center;justify-content:center;padding:18px}
 .ov.on{display:flex;animation:in .25s ease both}
@@ -139,7 +137,6 @@ p{color:var(--mut);font-size:.95rem}
   </section>
 </main>
 
-<a class="floatwa" id="fabWa" target="_blank" rel="noopener noreferrer" aria-label="Canal de WhatsApp"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.8-.1 1.4Z"/></svg></a>
 
 <!-- ===== MODALES ===== -->
 <div class="ov" id="mWa" role="dialog" aria-modal="true" aria-labelledby="mWaT"><div class="modal">
@@ -304,10 +301,14 @@ $("#btnRecheck").addEventListener("click", async ()=>{
 
 /* ---------- WhatsApp ---------- */
 function isPlaceholder(u){ return !u || /PEGA_AQUI/i.test(u); }
+function openTab(url){
+  const w=window.open(url,"_blank");          // sin "noopener" en la llamada: así se puede detectar un bloqueo real
+  if(w){ try{ w.opener=null; }catch(e){} return true; }
+  return false;
+}
 function openWhatsapp(){
   if(isPlaceholder(CONFIG.whatsappUrl)){ return; }
-  const w=window.open(CONFIG.whatsappUrl,"_blank","noopener,noreferrer");
-  if(!w){ $("#mWaGo").href=CONFIG.whatsappUrl; openM("#mWa"); }
+  if(!openTab(CONFIG.whatsappUrl)){ $("#mWaGo").href=CONFIG.whatsappUrl; openM("#mWa"); }
 }
 
 /* ---------- Flujo de etapa ---------- */
@@ -350,7 +351,7 @@ $("#btnAd").addEventListener("click", async ()=>{
     S.status="iniciada"; $("#btnAd").disabled=true; setStatus("Anuncio iniciado…");
     $("#adSlot").className="adslot busy"; $("#adTxt").textContent="Anuncio en curso…";
     if(CONFIG.adClickUrl && !isPlaceholder(CONFIG.adClickUrl)){
-      const w=window.open(CONFIG.adClickUrl,"_blank","noopener,noreferrer");
+      const w=openTab(CONFIG.adClickUrl);
       if(!w) setStatus("Tu navegador bloqueó la pestaña. El tiempo corre igualmente.");
     }
     S.phase=0.5; $("#adTxt").textContent="Verificando…"; setStatus("");   // 3 s sin mostrar cuenta
@@ -398,8 +399,7 @@ $("#btnDl").addEventListener("click", ()=>{
     $("#mErrP").textContent="El propietario aún no ha configurado la URL de descarga (CONFIG.downloadUrl).";
     $("#btnErrRetry").classList.add("hide"); openM("#mErr"); return;
   }
-  const w=window.open(CONFIG.downloadUrl,"_blank","noopener,noreferrer");
-  if(!w) location.href=CONFIG.downloadUrl;
+  if(!openTab(CONFIG.downloadUrl)) location.href=CONFIG.downloadUrl;
 });
 $("#btnRestart").addEventListener("click", ()=>openM("#mExit"));
 $("#btnExitYes").addEventListener("click", ()=>{ closeM("#mExit"); resetAll(); });
@@ -439,10 +439,10 @@ function init(){
   document.title=CONFIG.siteName+" · Desbloquea tu descarga";
   $("#siteName").textContent=CONFIG.siteName;
   $("#nStagesTxt").textContent=CONFIG.stages;
-  $("#lnkWa").href=$("#fabWa").href=CONFIG.whatsappUrl;
+  $("#lnkWa").href=CONFIG.whatsappUrl;
   fillFile(); load(); particles();
   // Enlace seguro: si no hay URL de WhatsApp válida, ocultar el botón flotante
-  if(isPlaceholder(CONFIG.whatsappUrl)){ $("#fabWa").classList.add("hide"); $("#lnkWa").classList.add("hide"); }
+  if(isPlaceholder(CONFIG.whatsappUrl)){ $("#lnkWa").classList.add("hide"); }
   if(S.done>=CONFIG.stages){ finish(); }
   else if(S.started){ renderStage(); show("sStage"); }
   // Carga única del script automático
