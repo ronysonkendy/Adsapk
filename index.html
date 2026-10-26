@@ -80,8 +80,11 @@ p{color:var(--mut);font-size:.95rem}
 .ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:1.6rem}
 .status{text-align:center;font-weight:600;min-height:1.4em;color:var(--cyan);font-size:.92rem}
 .note{font-size:.78rem;color:var(--mut);text-align:center;margin-top:10px}
-.floatwa{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:5;width:56px;height:56px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 0 22px rgba(37,211,102,.7)}
-.floatwa svg{width:30px;height:30px;fill:#fff}
+.social{position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:5;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+.social a{display:flex;align-items:center;gap:8px;min-height:46px;padding:0 16px 0 12px;border-radius:99px;color:#fff;text-decoration:none;font-weight:700;font-size:.88rem;box-shadow:0 0 18px rgba(0,0,0,.5)}
+.social svg{width:22px;height:22px;fill:#fff;flex:none}
+.social .wa{background:#25d366;box-shadow:0 0 20px rgba(37,211,102,.6)}
+.social .dc{background:#5865f2;box-shadow:0 0 20px rgba(88,101,242,.6)}
 /* modal */
 .ov{position:fixed;inset:0;z-index:20;background:rgba(3,4,12,.78);display:none;align-items:center;justify-content:center;padding:18px}
 .ov.on{display:flex;animation:in .25s ease both}
@@ -136,7 +139,11 @@ p{color:var(--mut);font-size:.95rem}
 </main>
 
 
-<a class="floatwa" id="fabWa" target="_blank" rel="noopener noreferrer" aria-label="Abrir canal de WhatsApp"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.8-.1 1.4Z"/></svg></a>
+<nav class="social" aria-label="Comunidad">
+  <a class="dc" id="fabDc" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="6"/><circle cx="9" cy="12" r="1.8" fill="#5865f2"/><circle cx="15" cy="12" r="1.8" fill="#5865f2"/></svg>Discord</a>
+  <a class="wa" id="fabGrp" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.8-.1 1.4Z"/></svg>Grupo</a>
+  <a class="wa" id="fabWa" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.2-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.3.1.2.1.8-.1 1.4Z"/></svg>Canal</a>
+</nav>
 
 <!-- ===== MODALES ===== -->
 <div class="ov" id="mWa" role="dialog" aria-modal="true" aria-labelledby="mWaT"><div class="modal">
@@ -171,6 +178,8 @@ p{color:var(--mut);font-size:.95rem}
 const CONFIG = {
   siteName: "KENDY MODS",
   whatsappUrl: "https://whatsapp.com/channel/0029Vb9K8MS6xCSIyFjwCv40", // canal de WhatsApp
+  whatsappGroupUrl: "https://chat.whatsapp.com/FSQ2JBEpUdIHFZdSKr3aBF?s=cl&p=a&mlu=4&ilr=4", // grupo de WhatsApp
+  discordUrl: "https://discord.gg/5gpk5Xv7s",   // servidor de Discord
   youtubeUrl:  "https://youtube.com/@kendymods?si=2CoZ_dAt9j_QMCiT",    // (opcional, se muestra en la última etapa)
   // Las descargas ya NO se ponen aquí: se administran en /editor (Firebase).
   firebase: {
@@ -446,10 +455,12 @@ function init(){
   document.title=CONFIG.siteName+" · Desbloquea tu descarga";
   $("#siteName").textContent=CONFIG.siteName;
   $("#nStagesTxt").textContent=CONFIG.stages;
-  $("#fabWa").href=CONFIG.whatsappUrl;
+  [["#fabWa",CONFIG.whatsappUrl],["#fabGrp",CONFIG.whatsappGroupUrl],["#fabDc",CONFIG.discordUrl]].forEach(([id,u])=>{
+    if(isPlaceholder(u)) $(id).classList.add("hide"); else $(id).href=u;
+  });
   fillFile(); load(); particles(); loadAutoAds();
   // Enlace seguro: si no hay URL de WhatsApp válida, ocultar el botón flotante
-  if(isPlaceholder(CONFIG.whatsappUrl)){ $("#fabWa").classList.add("hide"); }
+  if(isPlaceholder(CONFIG.whatsappUrl)){ /* ocultado arriba */ }
   if(S.done>=CONFIG.stages){ finish(); }
   else if(S.started){ renderStage(); show("sStage"); }
   // Si pierden conexión / recuperan, no se marca bloqueo automáticamente.
