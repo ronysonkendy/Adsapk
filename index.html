@@ -116,7 +116,7 @@ p{color:var(--mut);font-size:.95rem}
     <p class="center" style="margin-bottom:14px">Completa <b id="nStagesTxt">6</b> etapas consecutivas para acceder al archivo.</p>
     <div class="card pg"><div class="pg-top"><span>Progreso</span><span>0/6 · 0%</span></div><div class="bar"><i></i></div></div>
     <button class="btn b-main pulse" id="btnStart">COMENZAR</button>
-    <p class="note">En cada etapa toca la ventana del anuncio; el botón CONTINUAR se habilita al terminar las cuentas regresivas.</p>
+    <p class="note">Abre cada enlace y vuelve a esta página después de permanecer fuera al menos 2 segundos. La web verificará el regreso y habilitará el siguiente botón.</p>
   </section>
 
   <!-- ===== ETAPAS ===== -->
@@ -361,7 +361,7 @@ function renderStage(){
    Cada botón: tocar -> entra al enlace -> vuelve -> "VERIFICANDO…" -> ✅ y se habilita el siguiente.
    Solo se puede comprobar que la persona ABRIÓ el enlace y VOLVIÓ a esta página;
    no se puede saber si de verdad siguió, se unió o se suscribió. */
-let socialIdx=0, pendingLink=-1, leftSoc=false, leftAt=0, socialList=[], pollId=null, verifying=false;
+let socialIdx=0, pendingLink=-1, leftSoc=false, leftAt=0, clickAt=0, socialList=[], pollId=null, verifying=false, returnHandled=false;
 function setupSocial(){
   const defs=[
     {label:"1. SEGUIR EL CANAL DE WHATSAPP", ok:"✅ CANAL LISTO",   url:CONFIG.whatsappUrl},
@@ -376,8 +376,10 @@ function setupSocial(){
     a.href=d.url; a.target="_blank"; a.rel="noopener noreferrer";
     a.addEventListener("click",e=>{
       if(k!==socialIdx || verifying || pendingLink>=0){ if(k!==socialIdx||verifying) e.preventDefault(); return; }
-      pendingLink=k; leftSoc=false; leftAt=0; a.className="soc wait"; a.textContent="ENTRA AL ENLACE Y VUELVE…";
-      setStatus("Entra, sigue el enlace y regresa a esta página."); startPoll();
+      pendingLink=k; leftSoc=false; leftAt=0; clickAt=Date.now(); returnHandled=false;
+      a.className="soc wait"; a.textContent="ABRIENDO…";
+      setStatus("Abre el enlace y vuelve a esta página después de al menos 2 segundos.");
+      startPoll();
     });
     box.appendChild(a); socialList.push(a);
   });
@@ -389,33 +391,54 @@ function finishSocial(){
   $("#btnNext").classList.remove("hide"); $("#btnNext").disabled=false; $("#btnNext").classList.add("pulse");
   setStatus("¡Todo listo! Pulsa CONTINUAR.");
 }
-// Detección de salida/regreso: eventos + sondeo (algunos móviles no disparan todos los eventos)
-function socLeave(){ if(pendingLink>=0 && !leftSoc){ leftSoc=true; leftAt=Date.now(); } }
-function startPoll(){ stopPoll(); pollId=setInterval(()=>{
-  if(pendingLink<0) return stopPoll();
-  if(document.hidden || !document.hasFocus()) socLeave(); else socBack();
-},500); }
+// Detección de salida y regreso. Solo completa el botón si la página perdió
+// visibilidad/foco y el usuario volvió después del tiempo mínimo configurado.
+function socLeave(){
+  if(pendingLink<0 || leftSoc || verifying) return;
+  leftSoc=true;
+  leftAt=Date.now();
+  const a=socialList[pendingLink];
+  if(a){ a.textContent="VUELVE A ESTA PÁGINA…"; }
+}
+function startPoll(){
+  stopPoll();
+  pollId=setInterval(()=>{
+    if(pendingLink<0 || verifying){ stopPoll(); return; }
+    if(document.hidden || !document.hasFocus()) socLeave();
+    else if(leftSoc) socBack();
+  },250);
+}
 function stopPoll(){ if(pollId){ clearInterval(pollId); pollId=null; } }
 function socBack(){
-  if(pendingLink<0 || !leftSoc || document.hidden) return;
-  const k=pendingLink, a=socialList[k];
-  if(Date.now()-leftAt < CONFIG.minAwaySeconds*1000){   // volvió demasiado rápido: reintentar
-    pendingLink=-1; leftSoc=false; stopPoll(); a.className="soc now"; a.textContent=a.dataset.label;
-    setStatus("Quédate un momento en el enlace y vuelve a tocar el botón."); return;
+  if(pendingLink<0 || !leftSoc || document.hidden || verifying || returnHandled) return;
+  const elapsed=(Date.now()-leftAt)/1000;
+  if(elapsed < CONFIG.minAwaySeconds){
+    const a=socialList[pendingLink];
+    pendingLink=-1; leftSoc=false; returnHandled=false; stopPoll();
+    if(a){ a.className="soc now"; a.textContent=a.dataset.label; }
+    setStatus("Volviste demasiado rápido. Toca el botón e inténtalo otra vez, esperando más de 2 segundos fuera.");
+    return;
   }
+  returnHandled=true;
+  const k=pendingLink, a=socialList[k];
   pendingLink=-1; leftSoc=false; stopPoll(); verifying=true;
-  a.className="soc wait"; a.textContent="VERIFICANDO…"; setStatus("Verificando…");
-  runTimer(CONFIG.verifySeconds,()=>{               // 3 s, sin mostrar números
+  if(a){ a.className="soc wait"; a.textContent="VERIFICANDO…"; }
+  setStatus("Regreso detectado. Verificando…");
+  runTimer(CONFIG.verifySeconds,()=>{
     verifying=false; silent=false;
-    a.className="soc ok"; a.textContent=a.dataset.ok;
+    if(a){ a.className="soc ok"; a.textContent=a.dataset.ok; }
     socialIdx=k+1;
-    if(socialIdx<socialList.length){ socialList[socialIdx].className="soc now"; setStatus("¡Listo! Ahora el siguiente botón."); }
-    else finishSocial();
+    if(socialIdx<socialList.length){
+      socialList[socialIdx].className="soc now";
+      setStatus("¡Listo! Ahora puedes usar el siguiente botón.");
+    } else finishSocial();
   },true);
 }
-document.addEventListener("visibilitychange",()=>{ document.hidden?socLeave():socBack(); });
-window.addEventListener("pagehide",socLeave); window.addEventListener("pageshow",socBack);
-window.addEventListener("blur",socLeave); window.addEventListener("focus",socBack);
+document.addEventListener("visibilitychange",()=>{ if(document.hidden) socLeave(); else socBack(); });
+window.addEventListener("pagehide",socLeave);
+window.addEventListener("pageshow",socBack);
+window.addEventListener("blur",socLeave);
+window.addEventListener("focus",socBack);
 function drawTimer(){
   if(silent) return;
   $("#tNum").textContent=Math.ceil(tLeft);
