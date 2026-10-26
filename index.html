@@ -168,11 +168,16 @@ const CONFIG = {
   siteName: "KENDY MODS",
   whatsappUrl: "https://whatsapp.com/channel/0029Vb9K8MS6xCSIyFjwCv40", // canal de WhatsApp
   youtubeUrl:  "https://youtube.com/@kendymods?si=2CoZ_dAt9j_QMCiT",    // (opcional, se muestra en la última etapa)
-  // BOTONES DE DESCARGA (uno debajo del otro). Para agregar más, copia una línea.
-  // Los NUEVOS ponlos ARRIBA de la lista: salen primero en pantalla.
-  downloads: [
-    { label: "DESCARGAR (EDITAR NOMBRE)", url: "PEGA_AQUI_TU_URL_DE_DESCARGA" }
-  ],
+  // Las descargas ya NO se ponen aquí: se administran en /editor (Firebase).
+  firebase: {
+    apiKey: "AIzaSyA44bmeAGL6WthI39Bfn90jz4EFMChwbQs",
+    authDomain: "base-hack-76727.firebaseapp.com",
+    projectId: "base-hack-76727",
+    storageBucket: "base-hack-76727.firebasestorage.app",
+    messagingSenderId: "469682178915",
+    appId: "1:469682178915:web:f217010277df1426dbe156"
+  },
+  collection: "apps",
   fileName: "Nombre del archivo (EDITAR)",
   version: "v1.0",
   size: "0 MB",
@@ -374,21 +379,32 @@ $("#btnStageOk").addEventListener("click", ()=>{
 function finish(){
   clearTimer(); renderDownloads(); show("sDone");
 }
-function renderDownloads(){
-  const box=$("#dlList"); box.innerHTML="";
-  CONFIG.downloads.forEach(d=>{
-    const b=document.createElement("button");
-    b.className="btn b-ok"; b.style.minHeight="64px"; b.textContent=d.label;
-    b.addEventListener("click",()=>{
-      if(S.done<CONFIG.stages) return;
-      if(isPlaceholder(d.url)){
-        $("#mErrP").textContent="Este botón aún no tiene URL de descarga (CONFIG.downloads).";
-        $("#btnErrRetry").classList.add("hide"); openM("#mErr"); return;
-      }
-      if(!openTab(d.url)) location.href=d.url;
+const FB="https://www.gstatic.com/firebasejs/10.12.2/";
+async function renderDownloads(){
+  const box=$("#dlList"); box.innerHTML='<p class="center">Cargando descargas…</p>';
+  try{
+    const {initializeApp}=await import(FB+"firebase-app.js");
+    const {getFirestore,collection,query,orderBy,getDocs}=await import(FB+"firebase-firestore.js");
+    const db=getFirestore(initializeApp(CONFIG.firebase));
+    const snap=await getDocs(query(collection(db,CONFIG.collection),orderBy("createdAt","desc"))); // más recientes arriba
+    box.innerHTML="";
+    if(snap.empty){ box.innerHTML='<p class="center">Aún no hay descargas disponibles.</p>'; return; }
+    snap.forEach(doc=>{
+      const d=doc.data(); if(!/^https?:\/\//i.test(d.url||"")) return;   // solo enlaces http(s)
+      const b=document.createElement("button");
+      b.className="btn b-ok"; b.style.minHeight="64px"; b.textContent=d.name||"Descargar";
+      b.addEventListener("click",()=>{
+        if(S.done<CONFIG.stages) return;
+        if(!openTab(d.url)) location.href=d.url;
+      });
+      box.appendChild(b);
     });
-    box.appendChild(b);
-  });
+  }catch(e){
+    console.error(e);
+    box.innerHTML='<p class="center">No se pudieron cargar las descargas.</p>';
+    const r=document.createElement("button"); r.className="btn b-main"; r.textContent="REINTENTAR";
+    r.addEventListener("click",renderDownloads); box.appendChild(r);
+  }
 }
 function resetAll(){
   clearTimer(); S={done:0,status:"pendiente",phase:0,started:false}; save(); show("sWelcome");
