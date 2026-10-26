@@ -189,6 +189,7 @@ const CONFIG = {
     { src: "https://al5sm.com/tag.min.js",        zone: "12130485" },
     { src: "https://n6wxm.com/vignette.min.js",   zone: "12130495" }
   ],
+  adWaitSeconds: 20,   // si en este tiempo no entra al anuncio, puede tocar de nuevo
   verifySeconds: 3,    // "Verificando…" oculto (no muestra números)
   adClickUrl: "",      // enlace del anuncio activado por el usuario (deja "" para no abrir nada)
   storageKey: "kendy_progress_v1",
@@ -214,7 +215,7 @@ const STAGE_TEXT = [
 /* ---------- Estado ---------- */
 // status: pendiente | iniciada | temporizando | completada
 let S = { done: 0, status: "pendiente", phase: 0, started: false };
-let timerId = null, busy = false, adBlockedFlag = false;
+let timerId = null, busy = false, adBlockedFlag = false, waitId = null, leftPage = false;
 let tLeft = 0, tTotal = 0, lastTick = 0, silent = false;
 
 function save(){ try{ sessionStorage.setItem(CONFIG.storageKey, JSON.stringify({done:S.done,started:S.started})); }catch(e){} }
@@ -253,8 +254,10 @@ function renderProgress(){
 /* ---------- Anuncios: se inyectan SOLO al tocar la ventana del anuncio ----------
    Así el anuncio aparece por tu toque y no se dispara al tocar otras partes de la página.
    En cada toque se reemplazan los scripts para que se muestre un anuncio por etapa. */
+let adsInjected=false;
 function injectAds(){
-  if(!CONFIG.autoAds) return;
+  if(!CONFIG.autoAds || adsInjected) return;
+  adsInjected=true;
   $$("script[data-adtag]").forEach(x=>x.remove());
   CONFIG.adScripts.forEach(a=>{
     const s=document.createElement("script");
@@ -316,7 +319,7 @@ function renderStage(){
   const i=S.done, [t,x]=STAGE_TEXT[i%STAGE_TEXT.length];
   $("#stTitle").textContent=t; $("#stText").textContent=x;
   $("#stNote").textContent = i===CONFIG.stages-1 && CONFIG.youtubeUrl ? "Tip: visita también nuestro canal de YouTube." : "";
-  S.status="pendiente"; S.phase=0; clearTimer();
+  S.status="pendiente"; S.phase=0; clearTimer(); clearTimeout(waitId); adsInjected=false; leftPage=false;
   $("#btnAd").disabled=false;
   $("#btnPhase2").classList.remove("hide","pulse"); $("#btnPhase2").disabled=true; $("#btnPhase2").textContent="SEGUIR";
   $("#btnNext").classList.add("hide"); $("#btnNext").classList.remove("pulse"); $("#btnNext").disabled=true;
@@ -343,6 +346,22 @@ function runTimer(sec,onEnd,quiet){
     if(tLeft<=0){ clearTimer(); onEnd(); }
   },200);
 }
+function startVerify(){
+  if(S.phase!==0.2) return;
+  clearTimeout(waitId); S.phase=0.5;
+  $("#adSlot").className="adslot busy"; $("#adTxt").textContent="Verificando…"; setStatus("");  // 3 s sin mostrar cuenta
+  runTimer(CONFIG.verifySeconds,()=>{
+    S.phase=1.5; silent=false;
+    $("#adSlot").className="adslot done"; $("#adTxt").textContent="Listo";
+    $("#btnPhase2").disabled=false; $("#btnPhase2").classList.add("pulse");
+    setStatus("Botón habilitado. Pulsa SEGUIR.");
+  },true);
+}
+function onLeave(){ if(S.status==="pendiente"||S.status==="iniciada"){ if(S.phase<=0.2) leftPage=true; } }
+function onBack(){ if(S.phase===0.2 && leftPage) startVerify(); }
+document.addEventListener("visibilitychange",()=>{ document.hidden?onLeave():onBack(); });
+window.addEventListener("blur",onLeave); window.addEventListener("focus",onBack);
+$("#adSlot").addEventListener("pointerdown",()=>{ if(S.status==="pendiente"){ leftPage=false; injectAds(); } },{passive:true});
 $("#btnAd").addEventListener("click", async ()=>{
   if(busy||S.status!=="pendiente") return; busy=true;
   try{
@@ -354,13 +373,17 @@ $("#btnAd").addEventListener("click", async ()=>{
       const w=openTab(CONFIG.adClickUrl);
       if(!w) setStatus("Tu navegador bloqueó la pestaña. El tiempo corre igualmente.");
     }
-    S.phase=0.5; $("#adTxt").textContent="Verificando…"; setStatus("");   // 3 s sin mostrar cuenta
-    runTimer(CONFIG.verifySeconds,()=>{
-      S.phase=1.5; silent=false;
-      $("#adSlot").className="adslot done"; $("#adTxt").textContent="Listo";
-      $("#btnPhase2").disabled=false; $("#btnPhase2").classList.add("pulse");
-      setStatus("Botón habilitado. Pulsa SEGUIR.");
-    },true);
+    // Espera a que el usuario ENTRE al anuncio y VUELVA a esta página
+    S.phase=0.2;   // (leftPage se conserva: el anuncio puede abrirse justo al tocar)
+    $("#adTxt").textContent="Entra al anuncio y regresa aquí"; setStatus("");
+    clearTimeout(waitId);
+    waitId=setTimeout(()=>{            // si no se abrió ningún anuncio, permitir reintentar
+      if(S.phase!==0.2 || leftPage) return;
+      S.status="pendiente"; S.phase=0; $("#btnAd").disabled=false; adsInjected=false;
+      $("#adSlot").className="adslot"; $("#adTxt").textContent="TOCA DE NUEVO PARA ABRIR EL ANUNCIO";
+      setStatus("No detectamos que abrieras el anuncio.");
+    },CONFIG.adWaitSeconds*1000);
+    if(leftPage && !document.hidden) startVerify();   // ya salió y volvió durante la comprobación
   } finally { busy=false; }
 });
 $("#adSlot").addEventListener("click",()=>{ if(S.status==="pendiente") $("#btnAd").click(); });
