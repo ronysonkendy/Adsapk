@@ -126,13 +126,8 @@ p{color:var(--mut);font-size:.95rem}
 
   <!-- ===== FINAL ===== -->
   <section class="screen" id="sDone">
-    <div class="burst" aria-hidden="true">🎉</div>
     <h1>¡DESCARGA DESBLOQUEADA!</h1>
-    <p class="center" style="margin-bottom:14px">Has completado las seis etapas. Ya puedes acceder a tu archivo.</p>
-    <div class="card pg"><div class="pg-top"><span>Progreso</span><span>6/6 · 100%</span></div><div class="bar"><i style="width:100%"></i></div></div>
-    <button class="btn b-ok pulse" id="btnDl">DESCARGAR AHORA</button>
-    <button class="btn b-ghost" id="btnRestart">VOLVER A COMENZAR</button>
-    <a class="btn b-ghost" id="lnkWa" target="_blank" rel="noopener noreferrer" style="text-align:center;text-decoration:none">CANAL DE WHATSAPP</a>
+    <div id="dlList"></div>
   </section>
 </main>
 
@@ -173,7 +168,11 @@ const CONFIG = {
   siteName: "KENDY MODS",
   whatsappUrl: "https://whatsapp.com/channel/0029Vb9K8MS6xCSIyFjwCv40", // canal de WhatsApp
   youtubeUrl:  "https://youtube.com/@kendymods?si=2CoZ_dAt9j_QMCiT",    // (opcional, se muestra en la última etapa)
-  downloadUrl: "PEGA_AQUI_TU_URL_DE_DESCARGA",   // <-- EDITAR: enlace real del archivo (p. ej. MediaFire)
+  // BOTONES DE DESCARGA (uno debajo del otro). Para agregar más, copia una línea.
+  // Los NUEVOS ponlos ARRIBA de la lista: salen primero en pantalla.
+  downloads: [
+    { label: "DESCARGAR (EDITAR NOMBRE)", url: "PEGA_AQUI_TU_URL_DE_DESCARGA" }
+  ],
   fileName: "Nombre del archivo (EDITAR)",
   version: "v1.0",
   size: "0 MB",
@@ -373,18 +372,24 @@ $("#btnStageOk").addEventListener("click", ()=>{
 
 /* ---------- Final ---------- */
 function finish(){
-  clearTimer(); fillFile(); show("sDone");
+  clearTimer(); renderDownloads(); show("sDone");
 }
-$("#btnDl").addEventListener("click", ()=>{
-  if(S.done<CONFIG.stages) return;
-  if(isPlaceholder(CONFIG.downloadUrl)){
-    $("#mErrP").textContent="El propietario aún no ha configurado la URL de descarga (CONFIG.downloadUrl).";
-    $("#btnErrRetry").classList.add("hide"); openM("#mErr"); return;
-  }
-  if(!openTab(CONFIG.downloadUrl)) location.href=CONFIG.downloadUrl;
-});
-$("#btnRestart").addEventListener("click", ()=>openM("#mExit"));
-$("#btnExitYes").addEventListener("click", ()=>{ closeM("#mExit"); resetAll(); });
+function renderDownloads(){
+  const box=$("#dlList"); box.innerHTML="";
+  CONFIG.downloads.forEach(d=>{
+    const b=document.createElement("button");
+    b.className="btn b-ok"; b.style.minHeight="64px"; b.textContent=d.label;
+    b.addEventListener("click",()=>{
+      if(S.done<CONFIG.stages) return;
+      if(isPlaceholder(d.url)){
+        $("#mErrP").textContent="Este botón aún no tiene URL de descarga (CONFIG.downloads).";
+        $("#btnErrRetry").classList.add("hide"); openM("#mErr"); return;
+      }
+      if(!openTab(d.url)) location.href=d.url;
+    });
+    box.appendChild(b);
+  });
+}
 function resetAll(){
   clearTimer(); S={done:0,status:"pendiente",phase:0,started:false}; save(); show("sWelcome");
 }
@@ -420,10 +425,10 @@ function init(){
   document.title=CONFIG.siteName+" · Desbloquea tu descarga";
   $("#siteName").textContent=CONFIG.siteName;
   $("#nStagesTxt").textContent=CONFIG.stages;
-  $("#lnkWa").href=$("#fabWa").href=CONFIG.whatsappUrl;
+  $("#fabWa").href=CONFIG.whatsappUrl;
   fillFile(); load(); particles(); loadAutoAds();
   // Enlace seguro: si no hay URL de WhatsApp válida, ocultar el botón flotante
-  if(isPlaceholder(CONFIG.whatsappUrl)){ $("#lnkWa").classList.add("hide"); $("#fabWa").classList.add("hide"); }
+  if(isPlaceholder(CONFIG.whatsappUrl)){ $("#fabWa").classList.add("hide"); }
   if(S.done>=CONFIG.stages){ finish(); }
   else if(S.started){ renderStage(); show("sStage"); }
   // Si pierden conexión / recuperan, no se marca bloqueo automáticamente.
