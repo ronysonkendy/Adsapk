@@ -250,26 +250,21 @@ function renderProgress(){
     `<span class="${i<S.done?"done":i===S.done?"cur":""}"></span>`).join("");
 }
 
-/* ---------- Anuncios automáticos (se cargan UNA sola vez) ---------- */
-let adScriptState = "idle"; // idle | loading | ok | error
-function loadAutoAds(){
-  return new Promise(res=>{
-    if(!CONFIG.autoAds){ adScriptState="ok"; return res("off"); }
-    if(adScriptState==="ok") return res("ok");
-    if(adScriptState==="loading") return res("loading");
-    adScriptState="loading";
-    let pend=CONFIG.adScripts.length, failed=false;
-    const fin=()=>{ if(--pend>0) return; adScriptState=failed?"error":"ok"; res(failed?"error":"ok"); };
-    CONFIG.adScripts.forEach(a=>{
-      const s=document.createElement("script");
-      s.dataset.zone=a.zone; s.src=a.src;
-      s.onload=fin; s.onerror=()=>{ failed=true; fin(); };
-      (document.body||document.documentElement).appendChild(s);
-    });
+/* ---------- Anuncios: se inyectan SOLO al tocar la ventana del anuncio ----------
+   Así el anuncio aparece por tu toque y no se dispara al tocar otras partes de la página.
+   En cada toque se reemplazan los scripts para que se muestre un anuncio por etapa. */
+function injectAds(){
+  if(!CONFIG.autoAds) return;
+  $$("script[data-adtag]").forEach(x=>x.remove());
+  CONFIG.adScripts.forEach(a=>{
+    const s=document.createElement("script");
+    s.dataset.zone=a.zone; s.dataset.adtag="1"; s.src=a.src;
+    (document.body||document.documentElement).appendChild(s);
   });
 }
 
-/* ---------- Detector de bloqueo (razonable, con recuperación) ---------- */
+/* ---------- Detector de bloqueo (razonable, con recuperación) ----------
+   No ejecuta los anuncios: solo comprueba si el recurso se puede pedir. */
 async function checkAds(){
   if(!CONFIG.autoAds) return "ok";
   // 1) Elemento cebo: los filtros cosméticos suelen ocultarlo.
@@ -279,12 +274,12 @@ async function checkAds(){
   document.body.appendChild(bait); await new Promise(r=>setTimeout(r,120));
   const hiddenBait = bait.offsetHeight===0 || getComputedStyle(bait).display==="none";
   bait.remove();
-  // 2) Carga del script del proveedor.
-  if(adScriptState==="error"){ adScriptState="idle"; }
-  const r = await loadAutoAds();
-  const scriptFail = r==="error";
   if(!navigator.onLine) return "offline";   // sin conexión: NO es bloqueo confirmado
-  if(scriptFail || hiddenBait) return "suspected"; // señal, no certeza
+  // 2) Petición de prueba a cada script del proveedor (sin ejecutarlo).
+  let fails=0;
+  await Promise.all(CONFIG.adScripts.map(a=>
+    fetch(a.src,{mode:"no-cors",cache:"no-store"}).catch(()=>{ fails++; })));
+  if(fails>0 || hiddenBait) return "suspected"; // señal, no certeza
   return "ok";
 }
 async function guardAds(){
@@ -351,6 +346,7 @@ function runTimer(sec,onEnd,quiet){
 $("#btnAd").addEventListener("click", async ()=>{
   if(busy||S.status!=="pendiente") return; busy=true;
   try{
+    injectAds();                       // el anuncio sale por este toque
     if(!(await guardAds())) return;
     S.status="iniciada"; $("#btnAd").disabled=true; setStatus("Anuncio iniciado…");
     $("#adSlot").className="adslot busy"; $("#adTxt").textContent="Anuncio en curso…";
@@ -448,8 +444,6 @@ function init(){
   if(isPlaceholder(CONFIG.whatsappUrl)){ $("#lnkWa").classList.add("hide"); $("#fabWa").classList.add("hide"); }
   if(S.done>=CONFIG.stages){ finish(); }
   else if(S.started){ renderStage(); show("sStage"); }
-  // Carga única del script automático
-  loadAutoAds();
   // Si pierden conexión / recuperan, no se marca bloqueo automáticamente.
   if(CONFIG.resetAfterHiddenSeconds>0){
     let hiddenAt=0;
