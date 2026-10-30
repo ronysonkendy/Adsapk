@@ -1,1380 +1,335 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KENDY APK STUDIO</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dravi DPI · Panel de keys</title>
 <style>
-:root{--bg:#0b0f17;--panel:#121826;--panel2:#18202f;--line:#243049;--text:#e6ebf5;--muted:#8b97b0;--accent:#4f8cff;--accent2:#7c5cff;--ok:#2fd38a;--err:#ff5c70;--warn:#ffb84d}
-*{box-sizing:border-box}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-body{display:flex;flex-direction:column;overflow:hidden}
-[hidden]{display:none!important}
-button,input{font:inherit;color:inherit}
-.app{display:flex;flex:1;min-height:0}
-aside{width:250px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:16px 12px;gap:4px;flex-shrink:0;overflow-y:auto}
-.brand{font-weight:800;letter-spacing:.5px;font-size:17px;padding:4px 10px 14px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.nav{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:8px 12px;border-radius:10px;color:var(--muted);text-decoration:none;cursor:pointer;border:0;background:none;text-align:left;width:100%}
-.nav:hover:not(.off){background:var(--panel2);color:var(--text)}
-.nav.active{background:rgba(79,140,255,.15);color:var(--text)}
-.nav.off{opacity:.45;cursor:not-allowed}
-.tag{font-size:10px;padding:2px 7px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
-main{flex:1;overflow-y:auto;padding:24px;min-width:0;min-height:0}
-.sidehead{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.closeside{display:none;align-items:center;justify-content:center;min-width:44px;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-size:18px}
-.grp{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:14px 12px 4px}
-.proj{padding:2px 12px 8px;font-size:13px;word-break:break-word}
-#backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:35}
-body.menu #backdrop{display:block}
-.top{display:none;align-items:center;gap:12px;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex-shrink:0;position:relative;z-index:30}
-.burger{min-width:44px;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-size:20px}
-h1{margin:0 0 4px;font-size:24px}h2{margin:0 0 12px;font-size:17px}
-.sub{color:var(--muted);margin:0 0 20px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 18px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);cursor:pointer}
-.btn:hover{border-color:var(--accent)}
-.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));border:0;font-weight:700;color:#fff}
-.btn.danger{color:var(--err)}
-.btn.big{min-height:60px;font-size:17px;padding:14px 26px}
-.drop{border:2px dashed var(--line);border-radius:16px;padding:38px 16px;text-align:center;transition:.2s}
-.drop.over{border-color:var(--accent);background:rgba(79,140,255,.08)}
-.bar{height:10px;background:var(--panel2);border-radius:99px;overflow:hidden;margin-top:14px}
-.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .15s}
-.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 12px}
-.kv div:nth-child(odd){color:var(--muted)}
-.kv div{word-break:break-word}
-.row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-.icon{width:72px;height:72px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);object-fit:cover}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-.chip{padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;min-height:36px}
-.chip.on{border-color:var(--accent);background:rgba(79,140,255,.18)}
-input[type=search],input[type=text],input[type=password]{width:100%;min-height:46px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);outline:none}
-input:focus{border-color:var(--accent)}
-.files{max-height:420px;overflow-y:auto;border:1px solid var(--line);border-radius:12px}
-.file{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer;font-family:ui-monospace,Menlo,monospace;font-size:13px}
-.file:hover,.file.sel{background:var(--panel2)}
-.file span:first-child{word-break:break-all}.file span:last-child{color:var(--muted);white-space:nowrap}
-.note{padding:12px 14px;border-radius:12px;background:rgba(255,184,77,.1);border:1px solid rgba(255,184,77,.35);color:var(--warn);font-size:14px}
-.perm{font-family:ui-monospace,monospace;font-size:12px;color:var(--muted)}
-#toasts{position:fixed;right:14px;bottom:14px;display:flex;flex-direction:column;gap:8px;z-index:90;max-width:calc(100% - 28px)}
-.toast{padding:12px 16px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);animation:in .2s}
-.toast.ok{border-color:var(--ok)}.toast.err{border-color:var(--err)}
-@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.toast.warn{border-color:var(--warn)}
-main.ide-mode{position:relative;padding:0;overflow:hidden}
-.ide{position:absolute;inset:0;display:flex;flex-direction:column;background:#1a1d24}
-.idebar{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--panel);border-bottom:1px solid var(--line);overflow-x:auto;flex-shrink:0}
-.ib{min-width:42px;min-height:42px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-size:15px;flex-shrink:0;white-space:nowrap}
-.ib:hover{border-color:var(--accent)}.ib:disabled{opacity:.45;cursor:not-allowed}
-.ib.go{background:#1f7a3a;border-color:#2fd38a;font-weight:700}
-.idetabs{display:flex;overflow-x:auto;background:#14171d;border-bottom:1px solid var(--line);flex-shrink:0}
-.itab{display:flex;align-items:center;gap:6px;padding:0 4px 0 14px;min-height:42px;border-right:1px solid var(--line);color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0}
-.itab.on{color:var(--text);background:#1a1d24;box-shadow:inset 0 -2px var(--accent)}
-.itab .dot{color:var(--warn);font-size:11px}.itab .dot.ok{color:var(--ok)}
-.itab button{min-width:34px;min-height:34px;border:0;background:none;color:var(--muted);cursor:pointer;border-radius:8px}
-.idecrumb{padding:6px 12px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap;overflow-x:auto;flex-shrink:0}
-.idefind{display:flex;gap:6px;padding:8px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap;flex-shrink:0}
-.idefind input{flex:1;min-width:110px;min-height:42px}
-.idebody{flex:1;min-height:0;position:relative}
-.idedit{position:absolute;inset:0}
-.idedit .CodeMirror{height:100%;font-size:14px}
-.idempty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);padding:20px;text-align:center;pointer-events:none}
-.idestatus{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:8px 12px;border-top:1px solid var(--line);background:var(--panel);font-size:13px;color:var(--muted);flex-shrink:0;min-height:38px}
-.idemask{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:5}
-.idepanel{position:absolute;top:0;bottom:0;left:0;width:90%;max-width:400px;background:var(--panel);border-right:1px solid var(--line);z-index:6;display:flex;flex-direction:column}
-.idepanel .ph{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line)}
-.idepanel .pb{flex:1;overflow-y:auto;padding:12px}
-.seg{display:flex;gap:4px}.seg button{min-height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);cursor:pointer}
-.seg button.on{border-color:var(--accent);background:rgba(79,140,255,.18)}
-.idemenu{position:absolute;right:8px;top:56px;z-index:8;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:6px;display:flex;flex-direction:column;min-width:230px}
-.idemenu button{min-height:44px;text-align:left;padding:0 12px;border:0;background:none;cursor:pointer;border-radius:8px}
-.idemenu button:hover{background:var(--panel)}
-.nav[hidden]{display:none}
-.btn.sm{min-height:40px;padding:6px 12px;border-radius:10px}
-.tag{font-style:normal}
-em.tag{margin-left:6px;color:var(--accent)}
-select{width:100%;min-height:46px;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--text)}
-.ov{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column}
-.ovbar{display:flex;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
-.ovbar .ttl{flex:1;min-width:130px;word-break:break-all;font-size:13px}
-.ovbody{flex:1;min-height:0;position:relative}
-.ovbody.scroll{overflow-y:auto;padding:16px}
-.ovbody .CodeMirror{position:absolute;inset:0;height:auto;font-size:14px}
-.diff{position:absolute;inset:0;overflow:auto;margin:0;padding:10px;font:13px/1.45 ui-monospace,Menlo,monospace;white-space:pre-wrap;word-break:break-all}
-.diff span{display:block}.diff .da{background:rgba(47,211,138,.15)}.diff .dr{background:rgba(255,92,112,.18)}.diff .dg{color:var(--muted)}
-.pv{max-width:140px;max-height:140px;border:1px solid var(--line);border-radius:8px;display:block;background:repeating-conic-gradient(#2a3347 0 25%,#1c2333 0 50%) 0 0/14px 14px}
-.chk{padding:12px 14px;border-radius:12px;border:1px solid var(--line);margin-bottom:8px;background:var(--panel2)}
-.chk.ok{border-color:rgba(47,211,138,.5)}.chk.bad{border-color:rgba(255,92,112,.6)}.chk.warn{border-color:rgba(255,184,77,.6)}
-.chk small{display:block;color:var(--muted)}.chk .fix{color:var(--warn);margin-top:4px}
-@media(max-width:820px){
- .top{display:flex}.app{flex-direction:column}
- aside{position:fixed;top:0;bottom:0;left:0;width:84%;max-width:340px;z-index:40;transform:translateX(-100%);transition:.25s}
- aside.open{transform:none}
- .closeside{display:inline-flex}
- main{padding:16px}.kv{grid-template-columns:1fr}.kv div:nth-child(odd){margin-top:6px}
-}
+:root{--bg:#000;--card:#0e0e12;--btn:#14141c;--stroke:#2a2a35;--text:#eaeaf0;--muted:#8a8a99;--accent:#00e5ff;--good:#39ff14;--bad:#ff3b5c;--warn:#ffd000}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.bar{height:3px;background:linear-gradient(90deg,#ff0040,#ffd000,#00ff6a,#00e5ff,#7a3cff,#ff0040);background-size:200% 100%;animation:rgb 4s linear infinite}
+@keyframes rgb{to{background-position:-200% 0}}
+.wrap{max-width:560px;margin:0 auto;padding:16px 16px 60px}
+.logo{font-size:24px;letter-spacing:.08em;margin:10px 0 4px;font-weight:800;background:linear-gradient(90deg,#ff0040,#ffd000,#00ff6a,#00e5ff,#7a3cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo span{display:block;font-size:12px;-webkit-text-fill-color:var(--muted);color:var(--muted);letter-spacing:.2em;font-weight:600}
+.card{background:var(--card);border:1px solid var(--stroke);border-radius:14px;padding:16px;margin-top:14px}
+h2{margin:0 0 10px;font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+label{display:block;margin:12px 0 4px;font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+input,select{width:100%;background:var(--btn);border:1px solid var(--stroke);color:var(--text);border-radius:12px;padding:12px 14px;font-size:16px;outline:none}
+input:focus,select:focus{border-color:var(--accent)}
+.row{display:flex;gap:10px}
+.btn{width:100%;margin-top:14px;background:var(--btn);border:1px solid var(--accent);color:var(--accent);border-radius:12px;padding:14px;font-size:15px;font-weight:700;letter-spacing:.08em;cursor:pointer}
+.btn.good{border-color:var(--good);color:var(--good)}
+.btn.bad{border-color:var(--bad);color:var(--bad)}
+.btn.ghost{border-color:var(--stroke);color:var(--muted)}
+.btn.small{width:auto;margin:0;padding:8px 12px;font-size:12px}
+.btn:disabled{opacity:.5}
+.hidden{display:none!important}
+.hint,.msg{font-size:12px;color:var(--muted);margin:10px 0 0}
+.msg{color:var(--bad)}
+.top{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:13px;color:var(--muted)}
+.result{margin-top:14px;border:1px dashed var(--good);border-radius:12px;padding:14px;text-align:center}
+.result .big{font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--good);word-break:break-all;user-select:all}
+.result .sub{font-size:12px;color:var(--muted);margin-top:6px}
+.item{border:1px solid var(--stroke);border-radius:12px;padding:12px;margin-top:10px}
+.item .k{font-weight:800;letter-spacing:.05em;word-break:break-all}
+.meta{font-size:12px;color:var(--muted);margin-top:4px}
+.st{margin-top:6px;font-size:13px;font-weight:700}
+.st.good{color:var(--good)}.st.bad{color:var(--bad)}.st.warn{color:var(--warn)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}
+.modal .box{background:var(--card);border:1px solid var(--warn);border-radius:14px;padding:18px;max-width:440px;width:100%;font-size:14px;line-height:1.45}
+.modal ul{padding-left:18px;margin:8px 0;font-size:13px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(140px);background:#14141c;border:1px solid var(--good);color:var(--text);padding:12px 16px;border-radius:12px;font-size:14px;transition:transform .25s;z-index:20;max-width:90%}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.bad{border-color:var(--bad)}
 </style>
 </head>
 <body>
-<div class="top"><button class="burger" id="burger" aria-label="Abrir menú">☰</button><b>KENDY APK STUDIO</b></div>
-<div id="backdrop"></div>
-<div class="app">
-  <aside id="side">
-    <div class="sidehead"><div class="brand">KENDY APK STUDIO</div><button class="closeside" id="closeSide" aria-label="Cerrar menú">✕</button></div>
-    <div class="grp needauth">General</div>
-    <a class="nav needauth" href="#/home" data-r="home">Inicio</a>
-    <a class="nav needauth" href="#/projects" data-r="projects">Mis proyectos</a>
-    <a class="nav needauth" href="#/import" data-r="import">Importar APK</a>
-    <div class="grp needauth">Proyecto activo</div>
-    <div class="proj needauth" id="navProj"></div>
-    <a class="nav needauth" href="#/s/info" data-r="s:info">Resumen</a>
-    <a class="nav needauth" href="#/s/files" data-r="s:files">Archivos y código</a>
-    <a class="nav needauth" href="#/s/images" data-r="s:images">Imágenes e iconos</a>
-    <a class="nav needauth" href="#/s/props" data-r="s:props">Propiedades y XML</a>
-    <a class="nav needauth" href="#/s/changes" data-r="s:changes">Cambios e historial</a>
-    <a class="nav needauth" href="#/s/build" data-r="s:build">Compilación y enlaces</a>
-    <div class="grp">Sistema</div>
-    <a class="nav" id="navAdmin" href="#/admin" data-r="admin" hidden>Administración</a>
-    <a class="nav" href="#/diag" data-r="diag">Diagnóstico</a>
-    <a class="nav" href="#/settings" data-r="settings">Configuración</a>
-    <div id="who" style="margin-top:auto;padding:12px 4px 4px"></div>
-  </aside>
-  <main id="view"></main>
+<div class="bar"></div>
+<div class="wrap">
+  <h1 class="logo">DRAVI DPI <span>PANEL DE KEYS</span></h1>
+
+  <section id="login" class="card hidden">
+    <h2>Entrar</h2>
+    <input id="email" type="email" placeholder="Correo del administrador" autocomplete="username">
+    <input id="pass" type="password" placeholder="Contraseña" autocomplete="current-password" style="margin-top:10px">
+    <button id="btnLogin" class="btn">ENTRAR</button>
+    <p id="loginMsg" class="msg"></p>
+  </section>
+
+  <main id="panel" class="hidden">
+    <div class="top"><span id="who"></span><button id="btnOut" class="btn small ghost">Salir</button></div>
+
+    <section class="card">
+      <h2>Generar key</h2>
+      <label for="ffid">ID de Free Fire</label>
+      <input id="ffid" inputmode="numeric" placeholder="Ej. 123456789">
+      <label for="dur">Duración</label>
+      <select id="dur">
+        <option value="3600000">1 hora (prueba)</option>
+        <option value="86400000" selected>24 horas</option>
+        <option value="259200000">3 días</option>
+        <option value="604800000">7 días</option>
+        <option value="1296000000">15 días</option>
+        <option value="2592000000">30 días</option>
+        <option value="perm">Permanente</option>
+        <option value="custom">Personalizada…</option>
+      </select>
+      <div id="customBox" class="row hidden" style="margin-top:10px">
+        <input id="cn" type="number" min="1" placeholder="Cantidad">
+        <select id="cu">
+          <option value="60000">Minutos</option>
+          <option value="3600000">Horas</option>
+          <option value="86400000" selected>Días</option>
+        </select>
+      </div>
+      <label for="note">Nota (opcional)</label>
+      <input id="note" placeholder="Nombre del cliente, etc.">
+      <button id="btnGen" class="btn good">GENERAR KEY</button>
+      <p class="hint">La duración empieza a contar cuando la persona activa la key en la app. Cada key funciona en un solo teléfono.</p>
+      <div id="result" class="result hidden">
+        <div id="rKey" class="big"></div>
+        <div id="rSub" class="sub"></div>
+        <button id="rCopy" class="btn small" style="margin-top:10px">COPIAR KEY</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Keys generadas <span id="count"></span></h2>
+      <input id="search" placeholder="Buscar por ID, key o nota">
+      <div id="list"></div>
+    </section>
+  </main>
 </div>
-<div id="toasts"></div>
 
-<script>
-"use strict";
-const $ = (s, r = document) => r.querySelector(s);
-const MAX_MB = 200;
-const apiBase = () => (localStorage.getItem("kendy_api") || "").replace(/\/$/, "");
-const fmt = n => n < 1024 ? n + " B" : n < 1048576 ? (n / 1024).toFixed(1) + " KB" : (n / 1048576).toFixed(1) + " MB";
-// Todo texto que viene de un APK es no confiable: se inserta SIEMPRE con esc() o textContent.
-const esc = s => String(s ?? "—").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+<div id="modal" class="modal hidden">
+  <div class="box">
+    <div id="modalText"></div>
+    <div class="row">
+      <button id="mNo" class="btn ghost">NO</button>
+      <button id="mYes" class="btn good">SÍ</button>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
 
-const LOG_KEY = "kendy_log";
-let errLog = []; try { errLog = JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); } catch {}
-function logErr(src, msg, detail) {
-  errLog.push({ t: new Date().toISOString(), src, msg: String(msg), detail: detail ? String(detail).slice(0, 500) : "" });
-  errLog = errLog.slice(-50);
-  try { localStorage.setItem(LOG_KEY, JSON.stringify(errLog)); } catch {}
-}
-addEventListener("error", e => logErr("js", e.message, (e.filename || "") + ":" + e.lineno));
-addEventListener("unhandledrejection", e => logErr("promesa", e.reason?.message || e.reason));
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, set, update, remove, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-function toast(msg, type = "ok") {
-  if (type === "err") logErr("ui", msg);
-  const t = document.createElement("div");
-  t.className = "toast " + type; t.textContent = msg;
-  $("#toasts").appendChild(t); setTimeout(() => t.remove(), 4500);
-}
-function explainNetwork(url) {
-  if (location.protocol === "https:" && url.startsWith("http://")) return "Bloqueado: la web es HTTPS y el backend es HTTP. Usa un backend con https://.";
-  if (!apiBase()) return "Esta página no tiene backend. Configura la URL del backend en Configuración.";
-  return "No se pudo conectar con " + apiBase() + ": servidor apagado, URL incorrecta o CORS bloqueado. Abre Diagnóstico para ver cuál.";
-}
-function explainHttp(status, ct) {
-  if (status === 404 && !ct.includes("json"))
-    return "Error 404: esa dirección no tiene el backend de KENDY. " + (apiBase() ? "Revisa la URL en Configuración." : "Esta página es solo la pantalla: configura el backend en Configuración.");
-  return "Error " + status;
-}
-async function api(path, opts) {
-  const url = apiBase() + path; let res;
-  const headers = { ...((opts && opts.headers) || {}) };
-  if (getToken()) headers.Authorization = "Bearer " + getToken();
-  try { res = await fetch(url, { ...(opts || {}), headers }); }
-  catch (e) { const m = explainNetwork(url); logErr("red", m, url + " · " + e.message); throw new Error(m); }
-  const ct = res.headers.get("content-type") || "";
-  if (res.status === 401 && !path.startsWith("/api/auth/")) {
-    clearAuth(); location.hash = "#/login";
-    throw new Error("Tu sesión expiró. Inicia sesión otra vez.");
-  }
-  if (!res.ok) {
-    let m; try { m = (await res.json()).error.message; } catch {}
-    m = m || explainHttp(res.status, ct);
-    logErr("http", m, res.status + " " + url); throw new Error(m);
-  }
-  if (res.status === 204) return null;
-  if (!ct.includes("json")) { const m = "La URL respondió una página web en vez de la API: apunta al backend, no a la web."; logErr("http", m, url); throw new Error(m); }
-  return res.json();
-}
-
-/* ---------- Cuenta (login) ---------- */
-const getToken = () => localStorage.getItem("kendy_token") || "";
-function setAuth(token, user) {
-  localStorage.setItem("kendy_token", token);
-  localStorage.setItem("kendy_user", user?.email || "");
-  localStorage.setItem("kendy_role", user?.role || "");
-}
-function clearAuth() { ["kendy_token", "kendy_user", "kendy_role", "kendy_active"].forEach(k => localStorage.removeItem(k)); CUR = null; renderWho(); }
-const getActive = () => localStorage.getItem("kendy_active") || "";
-const setActive = id => localStorage.setItem("kendy_active", id);
-function renderNavProject() {
-  const el = $("#navProj"); if (!el) return;
-  if (CUR && CUR.id === getActive())
-    el.innerHTML = `<b>${esc(CUR.p.name)}</b><div class="perm">${esc(CUR.p.info.packageName)}</div><a href="#/projects" style="color:var(--accent);font-size:13px">Cambiar proyecto</a>`;
-  else el.innerHTML = getActive() ? '<span class="perm">Cargando…</span>' : '<span class="perm">Ninguno. Elige uno en “Mis proyectos”.</span>';
-}
-function renderWho() {
-  document.querySelectorAll(".needauth").forEach(x => { x.hidden = !getToken(); });
-  renderNavProject();
-  const na = $("#navAdmin"); if (na) na.hidden = !(getToken() && localStorage.getItem("kendy_role") === "admin");
-  const w = $("#who"); if (!w) return;
-  if (getToken()) {
-    w.innerHTML = `<div class="perm" style="word-break:break-all;margin-bottom:6px">${esc(localStorage.getItem("kendy_user") || "")}</div><button class="btn sm" id="logout" style="width:100%">Cerrar sesión</button>`;
-    $("#logout").onclick = async () => {
-      try { await api("/api/auth/logout", { method: "POST" }); } catch {}
-      clearAuth(); location.hash = "#/login";
-    };
-  } else w.innerHTML = '<div class="perm">Sin sesión iniciada</div>';
-}
-// Las imágenes del servidor exigen sesión: se piden con la cabecera y se muestran como blob.
-async function authBlobUrl(path) {
-  const res = await fetch(apiBase() + path, { headers: { Authorization: "Bearer " + getToken() } });
-  if (!res.ok) throw new Error("HTTP " + res.status);
-  return URL.createObjectURL(await res.blob());
-}
-function hydrateImgs(root) {
-  root.querySelectorAll("img[data-auth]").forEach(i => authBlobUrl(i.dataset.auth).then(u => { i.src = u; }).catch(() => { i.style.visibility = "hidden"; }));
-}
-// Firebase Authentication (solo para el inicio de sesión con Google). Esta configuración es pública por diseño.
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyAL7Mhp9oMFFBcZNHCHe350sIBhdZAgFq4",
-  authDomain: "kendy-mods.firebaseapp.com",
-  projectId: "kendy-mods",
-  appId: "1:130457387026:web:a2ede3d86060f2cb4a58cb"
+const firebaseConfig = {
+  apiKey: "AIzaSyA44bmeAGL6WthI39Bfn90jz4EFMChwbQs",
+  authDomain: "base-hack-76727.firebaseapp.com",
+  databaseURL: "https://base-hack-76727-default-rtdb.firebaseio.com",
+  projectId: "base-hack-76727",
+  storageBucket: "base-hack-76727.firebasestorage.app",
+  messagingSenderId: "469682178915",
+  appId: "1:469682178915:web:f217010277df1426dbe156",
+  measurementId: "G-SE1NQJR810"
 };
-let fbPromise = null;
-function loadFirebase() {
-  if (fbPromise) return fbPromise;
-  const B = "https://www.gstatic.com/firebasejs/10.12.2/";
-  fbPromise = loadScript(B + "firebase-app-compat.js").then(() => loadScript(B + "firebase-auth-compat.js")).then(() => {
-    if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
-    return firebase;
-  }).catch(e => { fbPromise = null; throw e; });
-  return fbPromise;
-}
-async function googleLogin() {
-  const btn = $("#gBtn"); if (btn) btn.disabled = true;
-  try {
-    const fb = await loadFirebase();
-    const cred = await fb.auth().signInWithPopup(new fb.auth.GoogleAuthProvider());
-    const idToken = await cred.user.getIdToken();
-    const r = await api("/api/auth/google", { method: "POST", headers: jsonHdr, body: JSON.stringify({ idToken }) });
-    setAuth(r.token, r.user); renderWho();
-    toast("Sesión iniciada"); location.hash = "#/home";
-    fb.auth().signOut().catch(() => {}); // la sesión de la app es la nuestra; no se deja abierta la de Firebase
-  } catch (e) {
-    const c = e && e.code || "";
-    if (c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") { if (btn) btn.disabled = false; return; }
-    const msg = c === "auth/unauthorized-domain" ? "Este dominio no está autorizado en Firebase: agrégalo en Authentication → Configuración → Dominios autorizados."
-      : c === "auth/operation-not-allowed" ? "Google no está activado en Firebase: Authentication → Método de acceso → Google."
-      : c === "auth/popup-blocked" ? "El navegador bloqueó la ventana de Google. Permite las ventanas emergentes e inténtalo de nuevo."
-      : (e && e.message) || "No se pudo iniciar sesión con Google.";
-    toast(msg, "err");
-    if (btn) btn.disabled = false;
-  }
-}
-function viewLogin() {
-  view.innerHTML = `<h1>Iniciar sesión</h1><p class="sub">Solo se entra con tu cuenta de Google. Cada cuenta ve solo sus propios proyectos.</p>
-  <div class="card"><button class="btn primary big" id="gBtn" style="width:100%">Continuar con Google</button></div>
-  <p class="perm">Servidor: ${esc(apiBase() || "(el mismo de esta página)")} · <a href="#/settings" style="color:var(--accent)">cambiar</a> · <a href="#/diag" style="color:var(--accent)">diagnóstico</a></p>`;
-  $("#gBtn").onclick = googleLogin;
+
+const fb = initializeApp(firebaseConfig);
+const auth = getAuth(fb);
+const db = getDatabase(fb);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let keys = {};
+let stopListen = null;
+let toastTimer;
+
+function toast(m, bad) {
+  const t = $('toast');
+  t.textContent = m;
+  t.className = 'toast show' + (bad ? ' bad' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = 'toast', 3500);
 }
 
-/* ---------- Vistas ---------- */
-const view = $("#view");
+function fmt(ms) {
+  const m = Math.floor(ms / 60000), d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mm = m % 60;
+  if (d > 0) return d + ' d ' + h + ' h';
+  if (h > 0) return h + ' h ' + mm + ' min';
+  return Math.max(mm, 1) + ' min';
+}
 
-function viewHome() {
-  view.innerHTML = `<h1>KENDY APK STUDIO</h1>
-  <p class="sub">Importa un APK que tengas derecho a modificar, explora su contenido y edita sus recursos.</p>
-  <div class="card"><a class="btn primary big" href="#/import">⬆ Importar APK</a>
-  <p class="sub" style="margin:14px 0 0">Ahora disponible: carga, análisis, explorador, editor de texto, reemplazo de imágenes e iconos, reconstrucción, firma y enlaces de descarga. También puedes editar nombre, versión, permisos y XML con Apktool (pestaña Propiedades).</p></div>
-  <div class="card"><h2>Estado del servidor</h2><div id="health">Comprobando…</div></div>
-  <div class="card" id="usage" hidden></div>`;
-  if (getToken()) api("/api/usage").then(u => {
-    const c = $("#usage"); if (!c) return; c.hidden = false;
-    c.innerHTML = `<h2>Tu uso</h2><div class="kv"><div>Proyectos</div><div>${u.projects} de ${u.projectLimit}</div><div>Espacio</div><div>${fmt(u.storageBytes)} de ${fmt(u.storageLimitBytes)}</div></div>`;
-  }).catch(() => {});
-  api("/health").then(h => {
-    const bad = h.ok === false;
-    $("#health").style.color = bad ? "var(--warn)" : "var(--ok)";
-    $("#health").innerHTML = (bad ? "⚠ Conectado, pero hay problemas. " : "✔ Conectado. ") + '<a href="#/diag" style="color:var(--accent)">Ver diagnóstico</a>';
-  }).catch(e => {
-    $("#health").style.color = "var(--err)";
-    $("#health").innerHTML = "✖ " + esc(e.message) + ' <a href="#/diag" style="color:var(--accent)">Ver diagnóstico</a>';
+function durLabel(ms) {
+  if (!ms) return 'Permanente';
+  const d = 86400000, h = 3600000, m = 60000;
+  if (ms % d === 0) return (ms / d) + (ms / d === 1 ? ' día' : ' días');
+  if (ms % h === 0) return (ms / h) + (ms / h === 1 ? ' hora' : ' horas');
+  return Math.round(ms / m) + ' min';
+}
+
+function status(v) {
+  if (v.revoked) return { t: 'Revocada', c: 'bad' };
+  if (!v.activatedAt) return { t: 'Sin activar', c: 'warn' };
+  if (!v.durationMs) return { t: 'Permanente · activa', c: 'good' };
+  const left = v.activatedAt + v.durationMs - Date.now();
+  if (left <= 0) return { t: 'Expirada', c: 'bad' };
+  return { t: 'Activa · vence en ' + fmt(left), c: 'good' };
+}
+
+const dateStr = ts => ts ? new Date(ts).toLocaleString('es') : '—';
+
+function confirmBox(html) {
+  return new Promise(res => {
+    $('modalText').innerHTML = html;
+    $('modal').classList.remove('hidden');
+    const done = v => { $('modal').classList.add('hidden'); $('mYes').onclick = $('mNo').onclick = null; res(v); };
+    $('mYes').onclick = () => done(true);
+    $('mNo').onclick = () => done(false);
   });
 }
 
-function viewImport() {
-  view.innerHTML = `<h1>Importar APK</h1><p class="sub">Máximo ${MAX_MB} MB. El archivo se valida y se analiza en el servidor; nunca se ejecuta.</p>
-  <div class="card"><div class="drop" id="drop"><p style="font-size:34px;margin:0">📦</p><p>Arrastra aquí tu APK</p>
-  <button class="btn primary big" id="pick">Seleccionar APK</button>
-  <input type="file" id="file" accept=".apk,application/vnd.android.package-archive" hidden></div>
-  <div id="prog" hidden><div id="progTxt" style="margin-top:14px"></div><div class="bar"><i id="progBar"></i></div></div></div>`;
-  const drop = $("#drop"), input = $("#file");
-  $("#pick").onclick = () => input.click();
-  input.onchange = () => input.files[0] && upload(input.files[0]);
-  ["dragenter", "dragover"].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.add("over"); }));
-  ["dragleave", "drop"].forEach(e => drop.addEventListener(e, ev => { ev.preventDefault(); drop.classList.remove("over"); }));
-  drop.addEventListener("drop", ev => ev.dataTransfer.files[0] && upload(ev.dataTransfer.files[0]));
+async function copy(t) {
+  try { await navigator.clipboard.writeText(t); toast('Copiado'); }
+  catch { prompt('Copia la key:', t); }
 }
 
-function upload(file) {
-  if (!/\.apk$/i.test(file.name)) return toast("El archivo debe tener extensión .apk", "err");
-  if (file.size > MAX_MB * 1048576) return toast(`El archivo supera ${MAX_MB} MB`, "err");
-  const fd = new FormData(); fd.append("file", file);
-  const xhr = new XMLHttpRequest();
-  $("#prog").hidden = false;
-  xhr.upload.onprogress = e => {
-    if (!e.lengthComputable) return;
-    const p = Math.round(e.loaded / e.total * 100);
-    $("#progBar").style.width = p + "%";
-    $("#progTxt").textContent = p < 100 ? `Subiendo… ${p}% (${fmt(e.loaded)} / ${fmt(e.total)})` : "Analizando APK en el servidor…";
-  };
-  xhr.onload = () => {
-    let body = {}; try { body = JSON.parse(xhr.responseText); } catch {}
-    if (xhr.status === 201) { toast("APK analizado correctamente"); location.hash = "#/project/" + body.id; }
-    else if (xhr.status === 401) { clearAuth(); location.hash = "#/login"; toast("Tu sesión expiró. Inicia sesión otra vez.", "err"); }
-    else { $("#prog").hidden = true; const m = body.error?.message || explainHttp(xhr.status, xhr.getResponseHeader("content-type") || ""); logErr("subida", m, xhr.status); toast(m, "err"); }
-  };
-  xhr.onerror = () => { $("#prog").hidden = true; toast(explainNetwork(apiBase() + "/api/projects"), "err"); };
-  xhr.open("POST", apiBase() + "/api/projects"); xhr.setRequestHeader("Authorization", "Bearer " + getToken()); xhr.send(fd);
+// ---------- Sesión ----------
+onAuthStateChanged(auth, user => {
+  if (stopListen) { stopListen(); stopListen = null; }
+  if (!user) {
+    $('login').classList.remove('hidden');
+    $('panel').classList.add('hidden');
+    keys = {};
+    return;
+  }
+  $('login').classList.add('hidden');
+  $('panel').classList.remove('hidden');
+  $('who').textContent = user.email;
+  stopListen = onValue(ref(db, 'keys'),
+    snap => { keys = snap.val() || {}; render(); },
+    err => toast('No se pueden leer las keys. Revisa las reglas y tu UID (' + err.code + ')', true));
+});
+
+$('btnLogin').onclick = async () => {
+  $('loginMsg').textContent = '';
+  try { await signInWithEmailAndPassword(auth, $('email').value.trim(), $('pass').value); }
+  catch (e) { $('loginMsg').textContent = 'No se pudo entrar: ' + (e.code || e.message); }
+};
+$('btnOut').onclick = () => signOut(auth);
+
+// ---------- Generar ----------
+const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function newKey() {
+  for (;;) {
+    const b = new Uint8Array(16);
+    crypto.getRandomValues(b);
+    let s = '';
+    for (const x of b) s += ALPHA[x % 32];
+    const k = 'DRAVI-' + s.match(/.{4}/g).join('-');
+    if (!keys[k]) return k;
+  }
 }
 
-async function viewProjects() {
-  view.innerHTML = `<h1>Mis proyectos</h1><p class="sub">Cada APK importado es un proyecto independiente.</p><div id="list" class="grid">Cargando…</div>`;
+$('dur').onchange = () => $('customBox').classList.toggle('hidden', $('dur').value !== 'custom');
+
+function durationMs() {
+  const sel = $('dur').value;
+  if (sel === 'perm') return 0;
+  if (sel === 'custom') {
+    const n = Number($('cn').value), u = Number($('cu').value);
+    return n > 0 ? Math.round(n * u) : null;
+  }
+  return Number(sel);
+}
+
+$('btnGen').onclick = async () => {
+  const id = $('ffid').value.replace(/\D/g, '');
+  if (id.length < 5) return toast('Escribe el ID de Free Fire (solo números)', true);
+  const ms = durationMs();
+  if (ms === null) return toast('Escribe una duración válida', true);
+
+  const prev = Object.entries(keys).filter(([k, v]) => String(v.id) === id);
+  if (prev.length) {
+    const lines = prev
+      .sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0))
+      .slice(0, 5)
+      .map(([k, v]) => `<li><b>${esc(k)}</b> · ${esc(durLabel(v.durationMs))} · ${esc(status(v).t)}</li>`)
+      .join('');
+    const ok = await confirmBox(`<b>⚠ Este ID ya tiene ${prev.length} key(s) generada(s).</b><ul>${lines}</ul>¿Quieres generar otra de todas formas?`);
+    if (!ok) return;
+  }
+
+  const key = newKey();
+  $('btnGen').disabled = true;
   try {
-    const rows = await api("/api/projects");
-    const list = $("#list");
-    if (!rows.length) { list.innerHTML = `<div class="card">Aún no hay proyectos. <a href="#/import" style="color:var(--accent)">Importa un APK</a>.</div>`; return; }
-    list.innerHTML = rows.map(p => `<div class="card" style="margin:0">
-      <div class="row"><img class="icon" style="width:52px;height:52px" data-auth="/api/projects/${esc(p.id)}/icon" alt="">
-      <div style="min-width:0"><b>${esc(p.name)}</b><div class="perm">${esc(p.package_name)}</div><div class="perm">v${esc(p.version_name)} · ${fmt(Number(p.size_bytes))}</div></div></div>
-      <div class="row" style="margin-top:12px"><a class="btn primary" href="#/project/${esc(p.id)}">Abrir</a>
-      <button class="btn danger" data-del="${esc(p.id)}">Eliminar</button></div></div>`).join("");
-    hydrateImgs(list);
-    list.querySelectorAll("[data-del]").forEach(b => b.onclick = async () => {
-      if (!confirm("¿Eliminar este proyecto y sus archivos? No se puede deshacer.")) return;
-      try { await api("/api/projects/" + b.dataset.del, { method: "DELETE" }); toast("Proyecto eliminado"); viewProjects(); }
-      catch (e) { toast(e.message, "err"); }
+    await set(ref(db, 'keys/' + key), {
+      id, durationMs: ms, createdAt: serverTimestamp(), note: $('note').value.trim(), revoked: false
     });
-  } catch (e) { $("#list").innerHTML = `<div class="card" style="color:var(--err)">${esc(e.message)}</div>`; }
-}
-
-const CAT = { manifest: "Manifiesto", dex: "Código DEX", image: "Imágenes", "resource-xml": "XML de recursos", resource: "Otros recursos",
-  "compiled-resources": "Recursos compilados", assets: "Assets", native: "Bibliotecas nativas", signature: "Firma (META-INF)", other: "Otros" };
-
-/* ---------- Proyecto abierto ---------- */
-let CUR = null;
-const enc = encodeURIComponent;
-const pbase = id => apiBase() + "/api/projects/" + enc(id);
-const extOf = p => (/\.([a-z0-9]+)$/i.exec(p) || [, ""])[1].toLowerCase();
-const baseName = p => (p.split("/").pop() || "").replace(/\.[^.]+$/, "");
-const fmtDate = s => new Date(s).toLocaleString();
-const jsonHdr = { "Content-Type": "application/json" };
-
-async function reloadFiles() { CUR.files = await api("/api/projects/" + CUR.id + "/files"); CUR.iconV = Date.now(); }
-
-// Cada botón del menú es una sección propia del proyecto activo.
-const SECTIONS = {
-  info: ["Resumen", el => renderInfo(el)],
-  files: ["Archivos y código", el => renderIde(el)],
-  images: ["Imágenes e iconos", el => renderImages(el)],
-  props: ["Propiedades y XML", el => renderProps(el)],
-  changes: ["Cambios e historial", el => renderChanges(el)],
-  build: ["Compilación y enlaces", el => renderBuild(el)],
+    $('rKey').textContent = key;
+    $('rSub').textContent = 'ID ' + id + ' · ' + durLabel(ms);
+    $('rCopy').onclick = () => copy(key);
+    $('result').classList.remove('hidden');
+    $('note').value = '';
+    copy(key);
+  } catch (e) {
+    toast('No se pudo guardar: ' + (e.code || e.message), true);
+  }
+  $('btnGen').disabled = false;
 };
 
-// #/project/<id>: se abre desde la lista o al importar; fija el proyecto activo y entra al Resumen.
-function viewProject(id) { setActive(id); CUR = null; location.hash = "#/s/info"; }
-
-async function viewPickProject(sec) {
-  view.innerHTML = `<h1>${esc(SECTIONS[sec][0])}</h1><p class="sub">Elige el proyecto con el que quieres trabajar.</p><div id="plist" class="grid">Cargando…</div>`;
-  let rows;
-  try { rows = await api("/api/projects"); }
-  catch (e) { $("#plist").innerHTML = `<div class="card" style="color:var(--err)">${esc(e.message)}</div>`; return; }
-  if (!rows.length) { $("#plist").innerHTML = '<div class="card">Aún no tienes proyectos. <a href="#/import" style="color:var(--accent)">Importa un APK</a>.</div>'; return; }
-  $("#plist").innerHTML = rows.map(p => `<div class="card" style="margin:0"><b>${esc(p.name)}</b><div class="perm">${esc(p.package_name)}</div>
-    <div class="row" style="margin-top:12px"><button class="btn primary" data-use="${esc(p.id)}">Usar este proyecto</button></div></div>`).join("");
-  $("#plist").onclick = e => { const b = e.target.closest("[data-use]"); if (b) { setActive(b.dataset.use); CUR = null; route(); } };
+// ---------- Lista ----------
+function render() {
+  const q = $('search').value.trim().toLowerCase();
+  const arr = Object.entries(keys)
+    .map(([k, v]) => ({ k, ...v }))
+    .filter(x => !q || x.k.toLowerCase().includes(q) || String(x.id).includes(q) || String(x.note || '').toLowerCase().includes(q))
+    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  $('count').textContent = '(' + arr.length + ')';
+  $('list').innerHTML = arr.length ? arr.map(x => {
+    const s = status(x);
+    return `<div class="item">
+      <div class="k">${esc(x.k)}</div>
+      <div class="meta">ID <b>${esc(x.id)}</b> · ${esc(durLabel(x.durationMs))}${x.note ? ' · ' + esc(x.note) : ''}</div>
+      <div class="meta">Creada: ${esc(dateStr(x.createdAt))}${x.activatedAt ? ' · Activada: ' + esc(dateStr(x.activatedAt)) : ''}</div>
+      <div class="meta">Teléfono: ${x.device ? esc(String(x.device).slice(0, 6)) + '…' : 'sin asignar'}</div>
+      <div class="st ${s.c}">${esc(s.t)}</div>
+      <div class="acts">
+        <button class="btn small" data-act="copy" data-k="${esc(x.k)}">Copiar</button>
+        <button class="btn small ghost" data-act="revoke" data-k="${esc(x.k)}">${x.revoked ? 'Reactivar' : 'Revocar'}</button>
+        <button class="btn small ghost" data-act="free" data-k="${esc(x.k)}">Liberar teléfono</button>
+        <button class="btn small bad" data-act="del" data-k="${esc(x.k)}">Eliminar</button>
+      </div>
+    </div>`;
+  }).join('') : '<p class="hint">Todavía no hay keys.</p>';
 }
 
-async function viewSection(sec) {
-  if (!SECTIONS[sec]) sec = "info";
-  const id = getActive();
-  if (!id) return viewPickProject(sec);
-  if (!CUR || CUR.id !== id) {
-    view.innerHTML = "Cargando…";
-    try {
-      const [p, files] = await Promise.all([api("/api/projects/" + id), api("/api/projects/" + id + "/files")]);
-      CUR = { id, p, files, tab: sec, cat: "all", q: "", iq: "", iconV: Date.now() };
-    } catch (e) {
-      if (/no encontrado/i.test(e.message)) { localStorage.removeItem("kendy_active"); CUR = null; renderNavProject(); return viewPickProject(sec); }
-      view.innerHTML = `<div class="card" style="color:var(--err)">${esc(e.message)}</div>`; return;
-    }
-  }
-  CUR.tab = sec;
-  renderNavProject();
-  drawProject();
-}
+$('search').oninput = render;
+setInterval(render, 30000);
 
-function drawProject() {
-  const { p, files } = CUR, n = files.filter(f => f.modified).length;
-  stopPoll();
-  view.classList.toggle("ide-mode", CUR.tab === "files");
-  if (CUR.tab === "files") { view.innerHTML = '<div id="tab" style="height:100%"></div>'; return renderIde($("#tab")); }
-  view.innerHTML = `<h1>${esc(SECTIONS[CUR.tab][0])}</h1><p class="sub">${esc(p.name)} · ${esc(p.info.packageName)}${n ? ` · <span style="color:var(--warn)">${n} archivo(s) modificado(s)</span>` : ""}</p><div id="tab"></div>`;
-  SECTIONS[CUR.tab][1]($("#tab"));
-}
-
-function renderInfo(el) {
-  const { p } = CUR, i = p.info, base = pbase(CUR.id);
-  el.innerHTML = `<div class="card"><div class="row"><img class="icon" alt="" style="visibility:hidden">
-  <div class="kv" style="flex:1;min-width:240px">
-   <div>Paquete</div><div>${esc(i.packageName)}</div>
-   <div>Versión</div><div>${esc(i.versionName)} (código ${esc(i.versionCode)})</div>
-   <div>Android mínimo (SDK)</div><div>${esc(i.minSdk)}</div>
-   <div>Android objetivo (SDK)</div><div>${esc(i.targetSdk)}</div>
-   <div>Actividad principal</div><div>${esc(i.launchActivity)}</div>
-   <div>Tamaño</div><div>${fmt(Number(p.size_bytes))} · ${esc(i.totalFiles)} archivos</div>
-   <div>Estado</div><div>${esc(p.status === "modified" ? "con cambios sin reconstruir" : "sin cambios")}</div>
-   <div>Arquitecturas</div><div>${i.nativeAbis.length ? esc(i.nativeAbis.join(", ")) : "ninguna (sin bibliotecas nativas)"}</div>
-   <div>SHA-256 original</div><div class="perm">${esc(p.original_sha256)}</div></div></div>
-   <div class="note" style="margin-top:14px" id="iconNote" hidden>El icono no se puede mostrar como imagen (probablemente es un icono adaptativo XML). Se puede ver en la pestaña Propiedades (Apktool).</div></div>
-  <div class="card"><h2>Permisos declarados (${i.permissions.length})</h2>
-   ${i.permissions.length ? i.permissions.map(x => `<div class="perm">${esc(x)}</div>`).join("") : "Ninguno"}</div>`;
-  authBlobUrl(`/api/projects/${enc(CUR.id)}/icon?v=${CUR.iconV}`)
-    .then(u => { const i = el.querySelector("img.icon"); if (i) { i.src = u; i.style.visibility = "visible"; } })
-    .catch(() => { const n = $("#iconNote"); if (n) n.hidden = false; });
-}
-
-function renderImages(el) {
-  const imgs = CUR.files.filter(f => f.kind === "image" && f.editable);
-  const iconPath = CUR.p.info.iconPath || "", ib = iconPath ? baseName(iconPath) : "";
-  const fam = ib ? imgs.filter(f => f.path.startsWith("res/") && baseName(f.path) === ib) : [];
-  const big = fam.slice().sort((a, b) => b.size - a.size)[0];
-  el.innerHTML = `<div class="card"><h2>Icono de la app</h2>
-    ${big ? `<div class="row"><img class="icon" data-auth="/api/projects/${enc(CUR.id)}/icon?v=${CUR.iconV}" alt="">
-      <div><div class="perm">${fam.length} tamaño(s) del icono encontrados</div><button class="btn primary" id="chIcon" style="margin-top:8px">Cambiar icono</button></div></div>`
-      : '<p class="note" style="margin:0">No hay iconos PNG/WebP editables (la app puede usar un icono adaptativo XML: se edita en Propiedades y XML).</p>'}</div>
-   <div class="card"><h2>Todas las imágenes (${imgs.length})</h2>
-    <input type="search" id="iq" placeholder="Buscar imagen…" value="${esc(CUR.iq || "")}">
-    <div class="files" id="ilist" style="margin-top:10px;max-height:none"></div><div id="imore"></div></div>`;
-  hydrateImgs(el);
-  if (big) $("#chIcon").onclick = () => openImageEditor(big.path);
-  let limit = 12;
-  const draw = () => {
-    const q = (CUR.iq || "").toLowerCase();
-    const shown = imgs.filter(f => !q || f.path.toLowerCase().includes(q));
-    $("#ilist").innerHTML = shown.slice(0, limit).map(f => `<div class="file" data-img="${esc(f.path)}" style="align-items:center"><span style="display:flex;gap:10px;align-items:center;min-width:0"><img class="pv" style="width:44px;height:44px;object-fit:cover;flex-shrink:0" data-auth="/api/projects/${enc(CUR.id)}/raw?path=${enc(f.path)}&version=current" alt=""><span style="word-break:break-all">${f.modified ? "● " : ""}${esc(f.path)}</span></span><span>${fmt(f.size)}</span></div>`).join("") || '<div class="file">Sin resultados</div>';
-    hydrateImgs($("#ilist"));
-    $("#imore").innerHTML = shown.length > limit ? `<button class="btn" id="more" style="margin-top:10px">Mostrar más (${shown.length - limit})</button>` : "";
-    const m = $("#more"); if (m) m.onclick = () => { limit += 12; draw(); };
-  };
-  draw();
-  $("#iq").oninput = e => { CUR.iq = e.target.value; limit = 12; draw(); };
-  $("#ilist").onclick = e => { const r = e.target.closest("[data-img]"); if (r) openImageEditor(r.dataset.img); };
-}
-
-async function renderChanges(el) {
-  el.innerHTML = '<div class="card">Cargando…</div>';
-  let r; try { r = await api(`/api/projects/${CUR.id}/changes`); }
-  catch (e) { el.innerHTML = `<div class="card" style="color:var(--err)">${esc(e.message)}</div>`; return; }
-  el.innerHTML = `<div class="card"><h2>Archivos modificados (${r.changes.length})</h2>
-   ${r.changes.length ? r.changes.map(c => `<div class="chk"><b>${esc(c.path)}</b><small>${c.kind === "text" ? "texto" : "imagen"} · ${fmt(Number(c.size_bytes))} · ${esc(fmtDate(c.updated_at))}</small>
-     <div class="row" style="margin-top:8px"><button class="btn sm" data-open="${esc(c.path)}" data-k="${esc(c.kind)}">Abrir</button><button class="btn sm danger" data-rs="${esc(c.path)}">Restaurar</button></div></div>`).join("") : "Todavía no hay cambios."}
-   ${r.changes.length ? '<button class="btn danger" id="discard" style="margin-top:8px">Descartar todos los cambios</button>' : ""}</div>
-  <div class="card"><h2>Historial</h2>${r.log.length ? r.log.map(l => `<div class="perm">${esc(fmtDate(l.at))} · ${esc(l.action)} · ${esc(l.path)}</div>`).join("") : "Sin historial."}</div>
-  <div class="note">Estos cambios se aplican al APK en la pestaña Compilación. En el plan gratuito de Render, los archivos pueden perderse si el servidor se reinicia.</div>`;
-  el.querySelectorAll("[data-open]").forEach(b => b.onclick = () => b.dataset.k === "text" ? openInIde(b.dataset.open, "apk") : openImageEditor(b.dataset.open));
-  el.querySelectorAll("[data-rs]").forEach(b => b.onclick = async () => {
-    if (!confirm("¿Restaurar el archivo original? Se perderán sus cambios.")) return;
-    try { await api(`/api/projects/${CUR.id}/changes?path=${enc(b.dataset.rs)}`, { method: "DELETE" }); toast("Archivo restaurado"); await reloadFiles(); drawProject(); }
-    catch (e) { toast(e.message, "err"); }
-  });
-  const dis = $("#discard");
-  if (dis) dis.onclick = async () => {
-    if (!confirm("¿Descartar TODOS los cambios y volver al APK original?")) return;
-    try { await api(`/api/projects/${CUR.id}/changes`, { method: "DELETE" }); toast("Cambios descartados"); await reloadFiles(); drawProject(); }
-    catch (e) { toast(e.message, "err"); }
-  };
-}
-
-/* ---------- Compilación y descarga ---------- */
-let buildTimer = null;
-function stopPoll() {
-  if (buildTimer) { clearInterval(buildTimer); buildTimer = null; }
-  if (decTimer) { clearInterval(decTimer); decTimer = null; }
-}
-const linkUrl = path => (apiBase() || location.origin) + path;
-const BSTATUS = { queued: "En cola", running: "Compilando…", success: "Compilada", failed: "Falló" };
-
-function renderCompare(r) {
-  const block = (title, arr, fmtItem) => arr.length ? `<div class="perm" style="margin-top:8px"><b>${title} (${arr.length})</b></div>${arr.slice(0, 60).map(fmtItem).join("")}` : "";
-  return `<div class="chk" style="margin-top:10px"><b>#${esc(r.version)} contra ${esc(r.against)}</b>
-    <small>${fmt(r.sizeA)} → ${fmt(r.sizeB)} · +${r.counts.added} añadidos · −${r.counts.removed} quitados · ≠${r.counts.changed} cambiados (la firma no cuenta)</small>
-    ${block("Añadidos", r.added, p => `<div class="perm">+ ${esc(p)}</div>`)}
-    ${block("Quitados", r.removed, p => `<div class="perm">− ${esc(p)}</div>`)}
-    ${block("Cambiados", r.changed, c => `<div class="perm">≠ ${esc(c.path)} (${fmt(c.sizeA)} → ${fmt(c.sizeB)})</div>`)}
-    ${!(r.counts.added + r.counts.removed + r.counts.changed) ? '<div class="perm" style="margin-top:8px">Sin diferencias en los archivos.</div>' : ""}</div>`;
-}
-
-function buildCard(b, all = []) {
-  const st = b.status, live = !!b.downloadPath, url = live ? linkUrl(b.downloadPath) : "";
-  const color = st === "success" ? "var(--ok)" : st === "failed" ? "var(--err)" : "var(--warn)";
-  const ok = st === "success";
-  return `<div class="card"><div class="row" style="justify-content:space-between"><b>Compilación #${b.number}${b.published ? " ⭐ publicada" : ""}</b><span style="color:${color}">${esc(BSTATUS[st])}</span></div>
-  <div class="perm">${esc(fmtDate(b.createdAt))} · ${esc(b.changesCount)} cambio(s)</div>
-  ${ok ? `<div class="row" style="margin-top:10px;gap:8px"><input type="text" maxlength="200" placeholder="Nota de esta versión (opcional)" value="${esc(b.note || "")}" data-noteinput="${esc(b.id)}" style="flex:1;min-width:160px"><button class="btn sm" data-note="${esc(b.id)}">Guardar nota</button></div>` : ""}
-  ${st === "failed" ? `<p class="note" style="margin-top:10px">${esc(b.error || "Error desconocido")}</p>` : ""}
-  ${ok ? `<div class="kv" style="margin-top:10px"><div>Archivo</div><div class="perm">${esc(b.fileName)}</div><div>Tamaño</div><div>${fmt(b.sizeBytes || 0)}</div>
-    <div>Firma</div><div>${b.verified ? "✔ verificada con apksigner" : "⚠ sin verificar"}</div><div>Certificado SHA-256</div><div class="perm">${esc(b.signerSha256)}</div>
-    <div>Probada en dispositivo</div><div>no</div><div>Enlace</div><div>${live ? "activo hasta " + esc(fmtDate(b.expiresAt)) : b.revoked ? "revocado" : "caducado"}</div></div>
-   <div class="row" style="margin-top:12px">${live
-     ? `<a class="btn primary" href="${esc(url)}">⬇ Descargar</a><button class="btn" data-copy="${esc(url)}">Copiar enlace</button><a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Abrir</a><button class="btn danger" data-revoke="${esc(b.id)}">Revocar</button>`
-     : `<button class="btn" data-newlink="${esc(b.id)}">Generar enlace nuevo</button>`}
-     <button class="btn" data-pub="${esc(b.id)}" data-on="${b.published ? "0" : "1"}">${b.published ? "Quitar de publicada" : "⭐ Marcar como publicada"}</button>
-     <button class="btn danger" data-delb="${esc(b.id)}">Eliminar</button></div>
-   <div class="row" style="margin-top:10px;gap:8px"><select data-with="${esc(b.id)}" style="flex:1;min-width:150px"><option value="original">Comparar con: APK original</option>${all.filter(x => x.id !== b.id && x.status === "success").map(x => `<option value="${esc(x.id)}">Comparar con: compilación #${x.number}</option>`).join("")}</select><button class="btn sm" data-cmp="${esc(b.id)}">Comparar</button></div>
-   <div data-cmpres="${esc(b.id)}"></div>` : ""}
-  ${b.log ? `<details style="margin-top:10px"><summary class="perm">Ver registro</summary><pre class="perm" style="white-space:pre-wrap">${esc(b.log)}</pre></details>` : ""}</div>`;
-}
-
-async function renderBuild(el) {
-  el.innerHTML = '<div class="card">Cargando…</div>';
-  await drawBuilds(el);
-}
-async function drawBuilds(el) {
-  let list;
-  try { list = await api(`/api/projects/${CUR.id}/builds`); }
-  catch (e) { el.innerHTML = `<div class="card" style="color:var(--err)">${esc(e.message)}</div>`; return; }
-  let m = 0;
-  try { m = (await api(`/api/projects/${CUR.id}/decoded`)).files.filter(f => f.modified).length; } catch {}
-  const n = CUR.files.filter(f => f.modified).length, busy = list.some(b => b.status === "queued" || b.status === "running");
-  el.innerHTML = `<div class="card"><h2>Reconstruir y firmar</h2>
-   <p class="sub" style="margin-bottom:12px">Se aplican tus <b>${n}</b> cambio(s) de texto/imagen${m ? ` y <b>${m}</b> de Apktool (propiedades y XML)` : ""} al APK original, se alinea y se firma con la clave de este servidor.${m ? " Al haber cambios de Apktool, el APK se reconstruye con Apktool: puede tardar más y fallar en algunas apps." : ""}</p>
-   <button class="btn primary" id="build" ${busy ? "disabled" : ""}>${busy ? "Compilando…" : "🔨 Reconstruir y firmar APK"}</button></div>
-   <div class="note" style="margin-bottom:16px">La firma será <b>distinta a la del APK original</b>: para instalarlo normalmente debes desinstalar antes la app original (se borran sus datos) y no se actualizará sobre ella. "Compilada" no significa "probada": instálala en un teléfono para comprobar que funciona.</div>
-   ${list.length ? list.map(b => buildCard(b, list)).join("") : '<div class="card">Aún no hay compilaciones.</div>'}
-   ${list.length ? '<p class="perm">Se conservan las últimas compilaciones y la marcada como publicada; las más antiguas se borran solas.</p>' : ""}`;
-  $("#build").onclick = async () => {
-    try { await api(`/api/projects/${CUR.id}/builds`, { method: "POST" }); toast("Compilación iniciada"); drawBuilds($("#tab")); }
-    catch (e) { toast(e.message, "err"); }
-  };
-  el.onclick = async ev => {
-    const t = ev.target.closest("button"); if (!t) return;
-    const d = t.dataset;
-    try {
-      if (d.copy) { try { await navigator.clipboard.writeText(d.copy); toast("Enlace copiado"); } catch { prompt("Copia el enlace:", d.copy); } }
-      else if (d.revoke) { if (!confirm("¿Revocar el enlace? Dejará de funcionar.")) return; await api(`/api/projects/${CUR.id}/builds/${d.revoke}/link`, { method: "DELETE" }); toast("Enlace revocado"); drawBuilds(el); }
-      else if (d.newlink) { await api(`/api/projects/${CUR.id}/builds/${d.newlink}/link`, { method: "POST" }); toast("Enlace nuevo generado"); drawBuilds(el); }
-      else if (d.note) {
-        await api(`/api/projects/${CUR.id}/builds/${d.note}`, { method: "PATCH", headers: jsonHdr, body: JSON.stringify({ note: el.querySelector(`[data-noteinput="${d.note}"]`).value }) });
-        toast("Nota guardada");
-      }
-      else if (d.pub) {
-        await api(`/api/projects/${CUR.id}/builds/${d.pub}`, { method: "PATCH", headers: jsonHdr, body: JSON.stringify({ published: d.on === "1" }) });
-        toast(d.on === "1" ? "Marcada como publicada" : "Ya no está marcada como publicada"); drawBuilds(el);
-      }
-      else if (d.cmp) {
-        const w = el.querySelector(`[data-with="${d.cmp}"]`).value;
-        const r = await api(`/api/projects/${CUR.id}/builds/${d.cmp}/compare?with=${enc(w)}`);
-        el.querySelector(`[data-cmpres="${d.cmp}"]`).innerHTML = renderCompare(r);
-      }
-      else if (d.delb) { if (!confirm("¿Eliminar esta compilación y su archivo?")) return; await api(`/api/projects/${CUR.id}/builds/${d.delb}`, { method: "DELETE" }); toast("Compilación eliminada"); drawBuilds(el); }
-    } catch (e) { toast(e.message, "err"); }
-  };
-  stopPoll();
-  if (busy) buildTimer = setInterval(() => { if (CUR && CUR.tab === "build" && document.body.contains(el)) drawBuilds(el); else stopPoll(); }, 2500);
-}
-
-/* ---------- Propiedades y XML (Apktool) ---------- */
-let decTimer = null;
-// Tarjeta para decodificar con Apktool: solo recursos, o recursos + código smali (la usan Propiedades y el IDE)
-function decodeCardHtml(d) {
-  const running = d.status === "running";
-  return `<div class="card"><h2>Decodificar con Apktool</h2>
-    <p class="sub" style="margin-bottom:12px">Para editar manifiesto, textos, colores y estilos (XML) el APK se decodifica en el servidor. Si además quieres editar el <b>código</b>, decodifícalo con código (smali). Puede tardar y usa mucha memoria: con el plan gratuito puede fallar en APK grandes.</p>
-    ${d.status === "failed" ? `<p class="note" style="margin-bottom:12px">${esc(d.error || "Falló la decodificación.")}</p>` : ""}
-    <div class="row"><button class="btn primary" data-dec="res" ${running ? "disabled" : ""}>${running ? "Decodificando…" : "Decodificar recursos"}</button>
-    <button class="btn" data-dec="full" ${running ? "disabled" : ""}>Decodificar con código</button></div></div>`;
-}
-function bindDecode(root, onChange) {
-  root.querySelectorAll("[data-dec]").forEach(b => b.onclick = async () => {
-    try { await api(`/api/projects/${CUR.id}/decode${b.dataset.dec === "full" ? "?code=1" : ""}`, { method: "POST" }); toast("Decodificación iniciada"); await reloadDecoded(); onChange(); }
-    catch (e) { toast(e.message, "err"); }
-  });
-}
-function startDecPoll(el, cb) {
-  stopPoll();
-  decTimer = setInterval(async () => {
-    if (!CUR || !document.body.contains(el)) return stopPoll();
-    try { await reloadDecoded(); } catch { return; }
-    if (CUR.dec.status !== "running") { stopPoll(); cb(); }
-  }, 3000);
-}
-
-async function reloadDecoded() { CUR.dec = await api(`/api/projects/${CUR.id}/decoded`); }
-
-async function renderProps(el) {
-  el.innerHTML = '<div class="card">Cargando…</div>';
-  try { await reloadDecoded(); }
-  catch (e) { el.innerHTML = `<div class="card" style="color:var(--err)">${esc(e.message)}</div>`; return; }
-  await drawProps(el);
-}
-async function drawProps(el) {
-  const d = CUR.dec, base = `/api/projects/${CUR.id}`;
-  if (d.status !== "ready") {
-    el.innerHTML = decodeCardHtml(d);
-    bindDecode(el, () => drawProps(el));
-    if (d.status === "running") startDecPoll(el, () => drawProps(el));
-    return;
-  }
-
-  let p;
-  try { p = (await api(`${base}/properties`)).properties; }
-  catch (e) { el.innerHTML = `<div class="card" style="color:var(--err)">${esc(e.message)}</div>`; return; }
-  const changed = d.files.filter(f => f.modified);
-
-  el.innerHTML = `<div class="card"><h2>Datos de la aplicación</h2>
-    <div class="kv"><div>Paquete</div><div class="perm">${esc(p.packageName)}</div></div>
-    <label class="perm" style="display:block;margin:12px 0 4px">Nombre visible</label><input type="text" id="pName" maxlength="60" value="${esc(p.appName ?? "")}">
-    <label class="perm" style="display:block;margin:12px 0 4px">Versión</label><input type="text" id="pVer" maxlength="40" value="${esc(p.versionName ?? "")}">
-    <label class="perm" style="display:block;margin:12px 0 4px">Número de versión</label><input type="text" id="pCode" inputmode="numeric" value="${esc(p.versionCode ?? "")}">
-    <div class="row" style="margin-top:14px"><button class="btn primary" id="pSave">Guardar propiedades</button></div>
-    <p class="perm" style="margin-top:10px">El paquete no se cambia aquí: cambiarlo rompe actualizaciones, datos y servicios vinculados.</p></div>
-  <div class="card"><h2>Permisos declarados (${p.permissions.length})</h2>
-    ${p.permissions.length ? p.permissions.map(x => `<label class="row" style="min-height:40px;gap:10px"><input type="checkbox" data-perm="${esc(x)}" style="width:22px;height:22px"><span class="perm" style="word-break:break-all">${esc(x)}</span></label>`).join("") : "Ninguno"}
-    ${p.permissions.length ? '<div class="row" style="margin-top:10px"><button class="btn danger" id="pRemove">Quitar los marcados</button></div><p class="perm" style="margin-top:8px">Quitar un permiso puede hacer que la app falle o pierda funciones. Solo se quita lo que marques y confirmes.</p>' : ""}</div>
-  <div class="card"><h2>Archivos XML decodificados</h2>
-    <input type="search" id="xq" placeholder="Buscar (strings, colors, styles…)" value="${esc(CUR.xq || "")}">
-    <div class="files" id="xfiles" style="margin-top:10px"></div></div>
-  <div class="card"><h2>Cambios de Apktool (${changed.length})</h2>
-    ${changed.length ? changed.map(f => `<div class="chk"><b style="word-break:break-all">${esc(f.path)}</b>
-      <div class="row" style="margin-top:8px"><button class="btn sm" data-xopen="${esc(f.path)}">Abrir</button><button class="btn sm danger" data-xrs="${esc(f.path)}">Restaurar</button></div></div>`).join("") : "Todavía no hay cambios."}
-    ${changed.length ? '<button class="btn danger" id="xdiscard" style="margin-top:8px">Descartar todos</button>' : ""}
-    <div class="row" style="margin-top:12px"><button class="btn sm" id="redec">Volver a decodificar</button></div></div>
-  <div class="note">Estos cambios se aplican al APK en la pestaña Compilación (se reconstruye con Apktool). Algunas apps no se pueden reconstruir con éxito: si falla, el registro explica el motivo.</div>`;
-
-  $("#pSave").onclick = async () => {
-    const body = {}, v = id => $(id).value.trim();
-    if (v("#pName") !== (p.appName ?? "")) body.appName = v("#pName");
-    if (v("#pVer") !== (p.versionName ?? "")) body.versionName = v("#pVer");
-    if (v("#pCode") !== (p.versionCode ?? "")) body.versionCode = v("#pCode");
-    if (!Object.keys(body).length) return toast("No hay cambios que guardar.", "warn");
-    try {
-      const r = await api(`${base}/properties`, { method: "PUT", headers: jsonHdr, body: JSON.stringify(body) });
-      (r.warnings || []).forEach(w => toast("⚠ " + w, "warn"));
-      toast("Propiedades guardadas"); await reloadDecoded(); drawProps(el);
-    } catch (e) { toast(e.message, "err"); }
-  };
-  const rm = $("#pRemove");
-  if (rm) rm.onclick = async () => {
-    const list = [...el.querySelectorAll("[data-perm]:checked")].map(c => c.dataset.perm);
-    if (!list.length) return toast("Marca al menos un permiso.", "warn");
-    if (!confirm(`Vas a quitar ${list.length} permiso(s):\n\n${list.join("\n")}\n\nLa app puede fallar o perder funciones (por ejemplo, sin INTERNET no tendrá red). ¿Continuar?`)) return;
-    try {
-      await api(`${base}/properties`, { method: "PUT", headers: jsonHdr, body: JSON.stringify({ removePermissions: list, confirmPermissions: true }) });
-      toast("Permisos quitados"); await reloadDecoded(); drawProps(el);
-    } catch (e) { toast(e.message, "err"); }
-  };
-
-  const drawX = () => {
-    const q = (CUR.xq || "").toLowerCase();
-    const shown = d.files.filter(f => !q || f.path.toLowerCase().includes(q));
-    $("#xfiles").innerHTML = shown.slice(0, 400).map(f => `<div class="file" data-x="${esc(f.path)}"><span>${f.modified ? "● " : ""}${esc(f.path)}</span><span>${fmt(f.size)}</span></div>`).join("") || '<div class="file">Sin resultados</div>';
-  };
-  drawX();
-  $("#xq").oninput = e => { CUR.xq = e.target.value; drawX(); };
-  $("#xfiles").onclick = e => { const r = e.target.closest("[data-x]"); if (r) openInIde(r.dataset.x, "decoded"); };
-  el.querySelectorAll("[data-xopen]").forEach(b => b.onclick = () => openInIde(b.dataset.xopen, "decoded"));
-  el.querySelectorAll("[data-xrs]").forEach(b => b.onclick = async () => {
-    if (!confirm("¿Restaurar el archivo original?")) return;
-    try { await api(`${base}/decoded/changes?path=${enc(b.dataset.xrs)}`, { method: "DELETE" }); toast("Archivo restaurado"); await reloadDecoded(); drawProps(el); }
-    catch (e) { toast(e.message, "err"); }
-  });
-  const dis = $("#xdiscard");
-  if (dis) dis.onclick = async () => {
-    if (!confirm("¿Descartar TODOS los cambios de Apktool?")) return;
-    try { await api(`${base}/decoded/changes`, { method: "DELETE" }); toast("Cambios descartados"); await reloadDecoded(); drawProps(el); }
-    catch (e) { toast(e.message, "err"); }
-  };
-  $("#redec").onclick = async () => {
-    if (!confirm(changed.length ? "Volver a decodificar borra los cambios de Apktool. ¿Seguir?" : "¿Volver a decodificar el APK?")) return;
-    try { await api(`${base}/decode${d.mode === "full" ? "?code=1" : ""}`, { method: "POST" }); await reloadDecoded(); drawProps(el); }
-    catch (e) { toast(e.message, "err"); }
-  };
-}
-
-/* ---------- Pantalla completa (editores) ---------- */
-function overlay(html) {
-  const o = document.createElement("div"); o.className = "ov"; o.innerHTML = html;
-  document.body.appendChild(o); document.body.style.overflow = "hidden";
-  o.close = () => { o.remove(); document.body.style.overflow = ""; };
-  return o;
-}
-function loadScript(src) {
-  return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("No se pudo cargar un componente externo (" + src.split("/").slice(-1)[0] + "). Revisa tu conexión.")); document.head.appendChild(s); });
-}
-let cmPromise = null;
-function defineSmali() {
-  if (CodeMirror.modes.smali) return;
-  CodeMirror.defineSimpleMode("smali", { start: [
-    { regex: /#.*/, token: "comment" },
-    { regex: /"(?:[^\\"]|\\.)*"/, token: "string" },
-    { regex: /\.[a-z][a-z-]*/, token: "keyword" },
-    { regex: /:[A-Za-z_]\w*/, token: "tag" },
-    { regex: /L[\w$\/]+;/, token: "variable-3" },
-    { regex: /\b[vp]\d+\b/, token: "atom" },
-    { regex: /-?0x[0-9a-fA-F]+L?|-?\d+(?:\.\d+)?[fFlL]?/, token: "number" },
-    { regex: /\b(?:invoke|move|const|return|iget|iput|sget|sput|new|if|goto|check|instance|throw|nop|add|sub|mul|div|rem|and|or|xor|shl|shr|ushr|neg|not|cmp|array|aget|aput|fill|filled|monitor|packed|sparse|int|long|float|double)[\w\/-]*/, token: "variable-2" },
-  ] });
-}
-function loadCM() {
-  if (cmPromise) return cmPromise;
-  const B = "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/";
-  [["codemirror.min.css"], ["theme/material-darker.min.css"]].forEach(([f]) => { const l = document.createElement("link"); l.rel = "stylesheet"; l.href = B + f; document.head.appendChild(l); });
-  cmPromise = loadScript(B + "codemirror.min.js")
-    .then(() => Promise.all(["mode/javascript/javascript.min.js", "mode/xml/xml.min.js", "mode/css/css.min.js", "addon/search/searchcursor.min.js", "addon/mode/simple.min.js", "mode/clike/clike.min.js"].map(x => loadScript(B + x))))
-    .then(() => loadScript(B + "mode/htmlmixed/htmlmixed.min.js"))
-    .then(defineSmali)
-    .catch(e => { cmPromise = null; throw e; });
-  return cmPromise;
-}
-
-/* Comparación línea por línea */
-function lineDiff(a, b) {
-  const x = a.split("\n"), y = b.split("\n"), n = x.length, m = y.length;
-  if (n * m > 4e6) return null;
-  const w = m + 1, dp = new Uint32Array((n + 1) * w);
-  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
-    dp[i * w + j] = x[i] === y[j] ? dp[(i + 1) * w + j + 1] + 1 : Math.max(dp[(i + 1) * w + j], dp[i * w + j + 1]);
-  const out = []; let i = 0, j = 0;
-  while (i < n && j < m) {
-    if (x[i] === y[j]) { out.push([" ", x[i]]); i++; j++; }
-    else if (dp[(i + 1) * w + j] >= dp[i * w + j + 1]) out.push(["-", x[i++]]);
-    else out.push(["+", y[j++]]);
-  }
-  while (i < n) out.push(["-", x[i++]]);
-  while (j < m) out.push(["+", y[j++]]);
-  return out;
-}
-function renderDiff(a, b) {
-  const d = lineDiff(a, b);
-  if (!d) return esc("El archivo es demasiado grande para compararlo línea por línea.");
-  if (!d.some(l => l[0] !== " ")) return esc("Sin diferencias con el original.");
-  let html = "", gap = false;
-  d.forEach((l, k) => {
-    const near = d.slice(Math.max(0, k - 2), k + 3).some(z => z[0] !== " ");
-    if (!near) { gap = true; return; }
-    if (gap) { html += '<span class="dg">…</span>'; gap = false; }
-    html += `<span class="d${l[0] === "+" ? "a" : l[0] === "-" ? "r" : "c"}">${esc(l[0] + " " + l[1])}</span>`;
-  });
-  return html;
-}
-
-/* ---------- IDE: archivos, pestañas, editor y compilación ---------- */
-const IDE = { pid: null, tabs: [], active: -1, cm: null, panel: "res", dir: "", q: { res: "", code: "", assets: "" }, showAll: false, pending: null, valMsg: "" };
-const rootOf = where => `/api/projects/${CUR.id}` + (where === "decoded" ? "/decoded" : "");
-const tabDirty = t => !t.doc.isClean(t.gen);
-const baseFile = p => p.split("/").pop();
-function modeFor(path) {
-  const e = extOf(path);
-  if (e === "smali") return "smali";
-  if (e === "java") return "text/x-java";
-  if (e === "json") return { name: "javascript", json: true };
-  if (e === "js") return "javascript";
-  if (e === "css") return "css";
-  if (e === "html" || e === "htm") return "htmlmixed";
-  if (e === "xml" || e === "svg") return "xml";
-  return null;
-}
-// Abre un archivo en el IDE (desde otras secciones)
-function openInIde(path, where) {
-  IDE.pending = { path, where };
-  if (location.hash === "#/s/files") route(); else location.hash = "#/s/files";
-}
-
-async function renderIde(el) {
-  // Un documento de CodeMirror solo puede estar en un editor: se libera el del editor anterior antes de crear el nuevo.
-  if (IDE.cm) { try { IDE.cm.swapDoc(CodeMirror.Doc("", null)); } catch (e) { /* editor ya descartado */ } IDE.cm = null; }
-  if (IDE.pid !== CUR.id) Object.assign(IDE, { pid: CUR.id, tabs: [], active: -1, cm: null, panel: "res", dir: "", q: { res: "", code: "", assets: "" }, showAll: false, pending: null, valMsg: "" });
-  el.innerHTML = `<div class="ide">
-    <div class="idebar">
-      <button class="ib" id="iFiles" title="Archivos">📁</button>
-      <button class="ib" id="iSave" title="Guardar">💾</button>
-      <button class="ib" id="iUndo" title="Deshacer">↶</button>
-      <button class="ib" id="iRedo" title="Rehacer">↷</button>
-      <button class="ib" id="iFind" title="Buscar y reemplazar">🔍</button>
-      <button class="ib" id="iDiff" title="Comparar con el original">⇄</button>
-      <button class="ib" id="iJava" title="Ver como Java (solo lectura)">☕ Java</button>
-      <button class="ib go" id="iBuild" title="Guardar y compilar">▶ Compilar</button>
-      <button class="ib" id="iMore" title="Más">⋯</button>
-    </div>
-    <div class="idetabs" id="iTabs"></div>
-    <div class="idecrumb" id="iCrumb"></div>
-    <div class="idefind" id="iFindBar" hidden>
-      <input type="search" id="fq" placeholder="Buscar"><input type="text" id="fr" placeholder="Reemplazar por">
-      <button class="ib" id="fPrev">↑</button><button class="ib" id="fNext">↓</button><button class="ib" id="fRep">Cambiar</button><button class="ib" id="fAll">Todo</button>
-    </div>
-    <div class="idebody"><div class="idedit" id="iEdit"></div><pre class="diff" id="iDiffView" hidden></pre><div class="idempty" id="iEmpty">Toca 📁 para abrir un archivo.</div></div>
-    <div class="idestatus"><span id="iPos"></span><span id="iBuildMsg"></span></div>
-    <div class="idemask" id="iMask" hidden></div>
-    <div class="idepanel" id="iPanel" hidden></div>
-    <div class="idemenu" id="iMenu" hidden>
-      <button data-m="saveall">Guardar todo</button><button data-m="restore">Restaurar archivo original</button>
-      <button data-m="close">Cerrar esta pestaña</button><button data-m="closeall">Cerrar todas las pestañas</button>
-    </div>
-  </div>`;
-  try { await loadCM(); } catch (e) { $("#iEmpty").textContent = e.message; toast(e.message, "err"); return; }
-  const cm = IDE.cm = CodeMirror($("#iEdit"), { theme: "material-darker", lineNumbers: true, lineWrapping: false, indentUnit: 4, tabSize: 4, value: "" });
-  let vt = 0;
-  cm.on("change", () => {
-    const t = IDE.tabs[IDE.active]; if (!t) return;
-    const d = tabDirty(t); if (d !== t.wasDirty) { t.wasDirty = d; ideTabsUi(); }
-    clearTimeout(vt); vt = setTimeout(ideValidate, 350);
-  });
-  cm.on("cursorActivity", ideStatusLine);
-
-  $("#iFiles").onclick = openPanel;
-  $("#iMask").onclick = closePanel;
-  $("#iSave").onclick = async () => { const t = IDE.tabs[IDE.active]; if (t && await ideSave(t)) toast(t.mod ? "Guardado" : "Igual al original: sin cambios"); };
-  $("#iUndo").onclick = () => { cm.undo(); cm.focus(); };
-  $("#iRedo").onclick = () => { cm.redo(); cm.focus(); };
-  $("#iFind").onclick = () => { const b = $("#iFindBar"); b.hidden = !b.hidden; if (!b.hidden) { const s = cm.getSelection(); if (s && !s.includes("\n")) $("#fq").value = s; $("#fq").focus(); } cm.refresh(); };
-  $("#iDiff").onclick = ideDiff;
-  $("#iJava").onclick = ideJavaButton;
-  $("#iBuild").onclick = ideBuild;
-  $("#iMore").onclick = () => { const m = $("#iMenu"); m.hidden = !m.hidden; };
-  $("#iMenu").onclick = async e => {
-    const b = e.target.closest("[data-m]"); if (!b) return; $("#iMenu").hidden = true;
-    if (b.dataset.m === "saveall") { let n = 0; for (const t of IDE.tabs.filter(tabDirty)) { if (!(await ideSave(t))) return; n++; } toast(n ? `${n} archivo(s) guardado(s)` : "No hay cambios sin guardar", n ? "ok" : "warn"); }
-    else if (b.dataset.m === "restore") ideRestore();
-    else if (b.dataset.m === "close") ideClose(IDE.active);
-    else if (b.dataset.m === "closeall") { if (IDE.tabs.some(tabDirty) && !confirm("Hay cambios sin guardar. ¿Cerrar todas las pestañas?")) return; IDE.tabs = []; IDE.active = -1; ideShow(); }
-  };
-  $("#iTabs").onclick = e => {
-    const x = e.target.closest("[data-x]"); if (x) return ideClose(Number(x.dataset.x));
-    const t = e.target.closest("[data-i]"); if (t) { IDE.active = Number(t.dataset.i); ideShow(); }
-  };
-
-  const Pos = CodeMirror.Pos, fq = $("#fq"), fr = $("#fr");
-  const findNext = rev => {
-    const t = fq.value; if (!t) return;
-    let sc = cm.getSearchCursor(t, cm.getCursor(rev ? "from" : "to"), { caseFold: true });
-    if (!(rev ? sc.findPrevious() : sc.findNext())) {
-      sc = cm.getSearchCursor(t, rev ? Pos(cm.lastLine()) : Pos(0, 0), { caseFold: true });
-      if (!(rev ? sc.findPrevious() : sc.findNext())) return toast("Sin coincidencias", "warn");
-    }
-    cm.setSelection(sc.from(), sc.to()); cm.scrollIntoView({ from: sc.from(), to: sc.to() }, 60);
-  };
-  $("#fNext").onclick = () => findNext(false); $("#fPrev").onclick = () => findNext(true);
-  fq.onkeydown = ev => { if (ev.key === "Enter") findNext(ev.shiftKey); };
-  $("#fRep").onclick = () => { const t = fq.value; if (!t) return; if (cm.getSelection().toLowerCase() === t.toLowerCase()) cm.replaceSelection(fr.value); findNext(false); };
-  $("#fAll").onclick = () => {
-    const t = fq.value; if (!t) return;
-    const sc = cm.getSearchCursor(t, Pos(0, 0), { caseFold: true }); let n = 0;
-    cm.operation(() => { while (sc.findNext()) { sc.replace(fr.value); n++; } });
-    toast(n + " reemplazo(s)", n ? "ok" : "warn");
-  };
-
-  ideShow();
-  ideWatchBuild(true);
-  if (IDE.pending) { const p = IDE.pending; IDE.pending = null; ideOpen(p.path, p.where); }
-}
-
-function ideShow() {
-  const t = IDE.tabs[IDE.active], cm = IDE.cm; if (!cm) return;
-  $("#iEmpty").hidden = !!t;
-  cm.swapDoc(t ? t.doc : CodeMirror.Doc("", null));
-  cm.setOption("readOnly", !!(t && t.readOnly));
-  setTimeout(() => cm.refresh(), 0);
-  IDE.valMsg = "";
-  showDiffView(false); ideTabsUi(); ideCrumb(); ideValidate();
-}
-function ideTabsUi() {
-  const box = $("#iTabs"); if (!box) return;
-  box.innerHTML = IDE.tabs.map((t, i) => `<div class="itab ${i === IDE.active ? "on" : ""}" data-i="${i}" title="${esc(t.path)}"><span>${t.where === "java" ? "☕ " : ""}${esc(baseFile(t.path))}</span>${tabDirty(t) ? '<span class="dot">●</span>' : t.mod ? '<span class="dot ok">●</span>' : ""}<button data-x="${i}" aria-label="Cerrar pestaña">✕</button></div>`).join("")
-    || '<div class="itab" style="color:var(--muted)">Sin archivos abiertos</div>';
-  const on = box.querySelector(".itab.on"); if (on) on.scrollIntoView({ block: "nearest", inline: "nearest" });
-}
-function ideCrumb() {
-  const c = $("#iCrumb"), t = IDE.tabs[IDE.active]; if (!c) return;
-  c.innerHTML = t ? `${esc(CUR.p.name)} › ${esc(t.path).split("/").join(" › ")}${t.where === "decoded" ? " · Apktool" : t.where === "java" ? " · solo lectura" : ""}` : esc(CUR.p.name);
-}
-function ideStatusLine() {
-  const el = $("#iPos"), cm = IDE.cm, t = IDE.tabs[IDE.active]; if (!el || !cm) return;
-  if (!t) { el.textContent = ""; return; }
-  const c = cm.getCursor();
-  el.textContent = (IDE.valMsg ? IDE.valMsg + " · " : "") + `Línea ${c.line + 1}, col ${c.ch + 1}`;
-}
-function ideValidate() {
-  const t = IDE.tabs[IDE.active]; IDE.valMsg = "";
-  if (t) {
-    const e = extOf(t.path), txt = t.doc.getValue();
-    if (t.where === "java") IDE.valMsg = "☕ Java aproximado · solo lectura";
-    else if (e === "json") { try { JSON.parse(txt); IDE.valMsg = "✔ JSON válido"; } catch (x) { IDE.valMsg = "⚠ JSON inválido"; } }
-    else if (e === "xml" || e === "svg") { const er = new DOMParser().parseFromString(txt, "application/xml").querySelector("parsererror"); IDE.valMsg = er ? "⚠ XML mal formado" : "✔ XML bien formado"; }
-  }
-  ideStatusLine();
-}
-function showDiffView(on) { const dv = $("#iDiffView"); if (!dv) return; dv.hidden = !on; $("#iEdit").style.visibility = on ? "hidden" : "visible"; }
-
-async function ideOpen(path, where) {
-  const key = where + ":" + path;
-  let i = IDE.tabs.findIndex(t => t.key === key);
-  if (i < 0) {
-    let info;
-    try { info = await api(`${rootOf(where)}/file?path=${enc(path)}`); }
-    catch (e) { return toast(e.message, "err"); }
-    if (!info.editable) return toast(info.reason || "Este archivo no se puede editar.", "err");
-    const doc = CodeMirror.Doc(info.content, modeFor(path));
-    IDE.tabs.push({ key, path, where, doc, gen: doc.changeGeneration(), mod: !!info.modified, orig: info.modified ? null : info.content, wasDirty: false });
-    i = IDE.tabs.length - 1;
-  }
-  IDE.active = i; closePanel(); ideShow();
-}
-function ideClose(i) {
-  const t = IDE.tabs[i]; if (!t) return;
-  if (tabDirty(t) && !confirm(`${baseFile(t.path)} tiene cambios sin guardar. ¿Cerrarlo de todos modos?`)) return;
-  IDE.tabs.splice(i, 1);
-  if (i < IDE.active) IDE.active--; else if (i === IDE.active) IDE.active = Math.min(i, IDE.tabs.length - 1);
-  ideShow();
-}
-async function ideSave(t) {
-  if (t.readOnly) { toast("Esta vista es de solo lectura.", "warn"); return false; }
+$('list').onclick = async e => {
+  const b = e.target.closest('button[data-act]');
+  if (!b) return;
+  const k = b.dataset.k, v = keys[k];
+  if (!v) return;
   try {
-    const r = await api(`${rootOf(t.where)}/file`, { method: "PUT", headers: jsonHdr, body: JSON.stringify({ path: t.path, content: t.doc.getValue() }) });
-    t.gen = t.doc.changeGeneration(); t.mod = r.modified; t.wasDirty = false;
-    (r.warnings || []).forEach(w => toast("⚠ " + w, "warn"));
-    if (t.where === "decoded") await reloadDecoded(); else await reloadFiles();
-    ideTabsUi(); refreshPanel();
-    return true;
-  } catch (e) { toast(e.message, "err"); return false; }
-}
-async function ideDiff() {
-  const t = IDE.tabs[IDE.active]; if (!t) return toast("Abre un archivo primero.", "warn");
-  if (t.readOnly) return toast("La vista Java es de solo lectura: no hay original que comparar.", "warn");
-  if (!$("#iDiffView").hidden) return showDiffView(false);
-  if (t.orig === null) {
-    try { t.orig = (await api(`${rootOf(t.where)}/file?path=${enc(t.path)}&version=original`)).content; }
-    catch (e) { return toast(e.message, "err"); }
-  }
-  $("#iDiffView").innerHTML = renderDiff(t.orig, t.doc.getValue()); showDiffView(true);
-}
-async function ideRestore() {
-  const t = IDE.tabs[IDE.active]; if (!t) return;
-  if (!t.mod) return toast("Este archivo no tiene cambios guardados.", "warn");
-  if (!confirm("¿Restaurar el archivo original? Se perderán los cambios guardados.")) return;
-  try {
-    await api(`${rootOf(t.where)}/changes?path=${enc(t.path)}`, { method: "DELETE" });
-    const r = await api(`${rootOf(t.where)}/file?path=${enc(t.path)}`);
-    t.doc.setValue(r.content); t.doc.clearHistory(); t.gen = t.doc.changeGeneration(); t.mod = false; t.wasDirty = false; t.orig = r.content;
-    if (t.where === "decoded") await reloadDecoded(); else await reloadFiles();
-    ideTabsUi(); refreshPanel(); toast("Archivo restaurado");
-  } catch (e) { toast(e.message, "err"); }
-}
-
-// Compilar: guarda lo pendiente, reconstruye, firma y muestra el resultado en la barra de abajo
-async function ideBuild() {
-  if ($("#iBuild").disabled) return;
-  for (const t of IDE.tabs.filter(tabDirty)) if (!(await ideSave(t))) return toast(`No se pudo guardar ${baseFile(t.path)}: no se compila.`, "err");
-  try { await api(`/api/projects/${CUR.id}/builds`, { method: "POST" }); }
-  catch (e) { return toast(e.message, "err"); }
-  toast("Compilación iniciada");
-  ideWatchBuild(false);
-}
-async function ideWatchBuild(quiet) {
-  stopPoll();
-  const msg = $("#iBuildMsg"), btn = $("#iBuild"); if (!msg || !btn) return;
-  const tick = async () => {
-    if (!document.body.contains(msg)) return stopPoll();
-    let list; try { list = await api(`/api/projects/${CUR.id}/builds`); } catch { return; }
-    const b = list[0];
-    if (b && (b.status === "queued" || b.status === "running")) { btn.disabled = true; msg.textContent = "⏳ Compilando…"; return; }
-    btn.disabled = false; stopPoll();
-    if (quiet || !b) { msg.textContent = ""; return; }
-    msg.innerHTML = b.status === "success"
-      ? `✔ Compilación #${b.number} lista · ${b.downloadPath ? `<a href="${esc(linkUrl(b.downloadPath))}" style="color:var(--accent)">Descargar</a> · ` : ""}<a href="#/s/build" style="color:var(--accent)">Detalles</a>`
-      : `✖ Falló: ${esc((b.error || "error").slice(0, 140))} · <a href="#/s/build" style="color:var(--accent)">Ver registro</a>`;
-  };
-  await tick();
-  if (btn.disabled) buildTimer = setInterval(tick, 2500);
-}
-
-/* --- Ver como Java (solo lectura, con JADX) --- */
-const classOfSmali = p => p.replace(/^smali(?:_classes\d+)?\//, "").replace(/\.smali$/, "").replace(/\//g, ".");
-const javaBoxHtml = () => `<div class="card" style="margin-bottom:12px"><h2>Ver como Java (solo lectura)</h2>
-  <p class="sub" style="margin-bottom:10px">Muestra una clase como Java aproximado, generado con JADX desde el APK original. Sirve para entender qué hace antes de editar el smali; no se puede recompilar.</p>
-  <input type="text" id="jCls" placeholder="com.ejemplo.MainActivity" autocapitalize="none" autocomplete="off">
-  <div class="row" style="margin-top:10px"><button class="btn primary" id="jGo">☕ Ver como Java</button></div></div>`;
-function bindJavaBox(root) {
-  const go = () => { const c = root.querySelector("#jCls").value.trim(); if (c) ideOpenJava(c); else toast("Escribe el nombre completo de la clase.", "warn"); };
-  root.querySelector("#jGo").onclick = go;
-  root.querySelector("#jCls").onkeydown = e => { if (e.key === "Enter") go(); };
-}
-// Botón ☕ de la barra: si hay un smali abierto, muestra su clase en Java; si no, abre el panel para escribirla
-function ideJavaButton() {
-  const t = IDE.tabs[IDE.active];
-  if (t && t.where === "decoded" && t.path.endsWith(".smali")) return ideOpenJava(classOfSmali(t.path));
-  IDE.panel = "code"; openPanel();
-  toast("Escribe el nombre de la clase o abre un archivo smali y pulsa ☕.", "warn");
-}
-async function ideOpenJava(cls) {
-  const key = "java:" + cls;
-  let i = IDE.tabs.findIndex(t => t.key === key);
-  if (i < 0) {
-    toast("Decompilando con JADX… puede tardar un poco.", "warn");
-    let r;
-    try { r = await api(`/api/projects/${CUR.id}/java?class=${enc(cls)}`); }
-    catch (e) { return toast(e.message, "err"); }
-    if (r.truncated) toast("La clase es muy grande: se muestra solo el principio.", "warn");
-    const doc = CodeMirror.Doc(r.code, "text/x-java");
-    IDE.tabs.push({ key, path: cls.replace(/\./g, "/") + ".java", where: "java", doc, gen: doc.changeGeneration(), mod: false, orig: null, wasDirty: false, readOnly: true });
-    i = IDE.tabs.length - 1;
-  }
-  IDE.active = i; closePanel(); ideShow();
-}
-
-/* --- Panel de archivos --- */
-function openPanel() { $("#iPanel").hidden = false; $("#iMask").hidden = false; drawPanel(); }
-function closePanel() { const p = $("#iPanel"); if (p) { p.hidden = true; $("#iMask").hidden = true; } }
-function refreshPanel() { const p = $("#iPanel"); if (p && !p.hidden) drawPanel(); }
-
-async function drawPanel() {
-  const p = $("#iPanel"); if (!p) return;
-  const seg = (k, t) => `<button data-p="${k}" class="${IDE.panel === k ? "on" : ""}">${t}</button>`;
-  p.innerHTML = `<div class="ph"><div class="seg">${seg("res", "XML")}${seg("code", "Código")}${seg("assets", "Assets")}</div><button class="ib" id="pClose" aria-label="Cerrar">✕</button></div><div class="pb" id="pBody">Cargando…</div>`;
-  p.querySelectorAll("[data-p]").forEach(b => b.onclick = () => { IDE.panel = b.dataset.p; drawPanel(); });
-  $("#pClose").onclick = closePanel;
-  const body = $("#pBody");
-  if (IDE.panel === "assets") return panelAssets(body);
-  try { await reloadDecoded(); } catch (e) { body.innerHTML = `<div class="note">${esc(e.message)}</div>`; return; }
-  const d = CUR.dec;
-  if (d.status !== "ready") {
-    body.innerHTML = decodeCardHtml(d); bindDecode(body, drawPanel);
-    if (IDE.panel === "code") { body.insertAdjacentHTML("afterbegin", javaBoxHtml()); bindJavaBox(body); }
-    if (d.status === "running") startDecPoll(body, drawPanel);
-    return;
-  }
-  return IDE.panel === "res" ? panelRes(body, d) : panelCode(body, d);
-}
-
-function panelRes(body, d) {
-  body.innerHTML = `<input type="search" id="pq" placeholder="Buscar (strings, colors, styles…)" value="${esc(IDE.q.res)}"><div class="files" id="pList" style="margin-top:8px;max-height:none"></div>`;
-  const draw = () => {
-    const q = IDE.q.res.toLowerCase(), items = d.files.filter(f => !q || f.path.toLowerCase().includes(q));
-    $("#pList").innerHTML = items.slice(0, 400).map(f => `<div class="file" data-o="${esc(f.path)}"><span>${f.modified ? "● " : ""}${esc(f.path)}</span><span>${fmt(f.size)}</span></div>`).join("") || '<div class="file">Sin resultados</div>';
-  };
-  draw();
-  $("#pq").oninput = e => { IDE.q.res = e.target.value; draw(); };
-  $("#pList").onclick = e => { const r = e.target.closest("[data-o]"); if (r) ideOpen(r.dataset.o, "decoded"); };
-}
-
-function panelCode(body, d) {
-  if (d.mode !== "full") {
-    body.innerHTML = javaBoxHtml() + `<div class="note">Este proyecto se decodificó solo con recursos. Para editar el código hay que decodificarlo con código (smali). Se borran los cambios de Apktool que no hayas compilado.</div>
-      <div class="row" style="margin-top:12px"><button class="btn primary" id="toFull">Decodificar con código</button></div>`;
-    bindJavaBox(body);
-    $("#toFull").onclick = async () => {
-      if (d.files.some(f => f.modified) && !confirm("Se perderán los cambios de Apktool sin compilar. ¿Seguir?")) return;
-      try { await api(`/api/projects/${CUR.id}/decode?code=1`, { method: "POST" }); toast("Decodificación iniciada"); await reloadDecoded(); drawPanel(); }
-      catch (e) { toast(e.message, "err"); }
-    };
-    return;
-  }
-  body.innerHTML = javaBoxHtml() + `<div class="note" style="margin-bottom:8px">El código está en <b>smali</b> (ensamblador de Android), no en Java/Kotlin. Un error de sintaxis impide compilar.</div>
-    <input type="search" id="cq" placeholder="Buscar clase (ej. MainActivity)" value="${esc(IDE.q.code)}">
-    <div id="cCrumb" class="perm" style="margin:8px 0;word-break:break-all"></div><div class="files" id="cList" style="max-height:none"></div>`;
-  bindJavaBox(body);
-  let timer = 0;
-  const load = async () => {
-    const q = IDE.q.code.trim(), list = $("#cList"); if (!list) return;
-    list.innerHTML = '<div class="file">Cargando…</div>';
-    try {
-      const r = await api(`/api/projects/${CUR.id}/decoded/tree?` + (q.length >= 2 ? `q=${enc(q)}` : `dir=${enc(IDE.dir)}`));
-      $("#cCrumb").textContent = r.searched ? `Resultados para “${q}”` : "📂 " + (IDE.dir || "(raíz)");
-      const up = !r.searched && IDE.dir ? `<div class="file" data-d="${esc(IDE.dir.split("/").slice(0, -1).join("/"))}"><span>⬆ Subir</span><span></span></div>` : "";
-      list.innerHTML = up + (r.entries.map(e => e.type === "dir"
-        ? `<div class="file" data-d="${esc(e.path)}"><span>📁 ${esc(e.name)}</span><span></span></div>`
-        : `<div class="file" data-f="${esc(e.path)}"><span style="word-break:break-all">${e.modified ? "● " : ""}📄 ${esc(r.searched ? e.path : e.name)}</span><span>${e.size ? fmt(e.size) : ""}</span></div>`).join("") || '<div class="file">Vacío</div>');
-    } catch (e) { list.innerHTML = `<div class="file" style="color:var(--err)">${esc(e.message)}</div>`; }
-  };
-  load();
-  $("#cq").oninput = e => { IDE.q.code = e.target.value; clearTimeout(timer); timer = setTimeout(load, 350); };
-  $("#cList").onclick = e => {
-    const dd = e.target.closest("[data-d]"); if (dd) { IDE.dir = dd.dataset.d; IDE.q.code = ""; $("#cq").value = ""; return load(); }
-    const f = e.target.closest("[data-f]"); if (f) ideOpen(f.dataset.f, "decoded");
-  };
-}
-
-function panelAssets(body) {
-  body.innerHTML = `<input type="search" id="aq" placeholder="Buscar archivo…" value="${esc(IDE.q.assets)}">
-    <label class="row" style="min-height:40px;gap:10px"><input type="checkbox" id="aAll" ${IDE.showAll ? "checked" : ""} style="width:22px;height:22px"><span class="perm">Ver todos los archivos del APK (solo lectura)</span></label>
-    <div class="files" id="aList" style="max-height:none"></div>`;
-  const draw = () => {
-    const q = IDE.q.assets.toLowerCase();
-    const items = CUR.files.filter(f => (IDE.showAll || (f.kind === "text" && f.editable)) && (!q || f.path.toLowerCase().includes(q)));
-    $("#aList").innerHTML = items.slice(0, 400).map(f => `<div class="file" data-a="${esc(f.path)}"><span>${f.modified ? "● " : ""}${esc(f.path)}${f.editable ? ` <em class="tag">${f.kind === "text" ? "texto" : "imagen"}</em>` : ""}</span><span>${fmt(f.size)}</span></div>`).join("")
-      || '<div class="file">Sin archivos de texto editables. Marca “Ver todos”.</div>';
-  };
-  draw();
-  $("#aq").oninput = e => { IDE.q.assets = e.target.value; draw(); };
-  $("#aAll").onchange = e => { IDE.showAll = e.target.checked; draw(); };
-  $("#aList").onclick = async e => {
-    const r = e.target.closest("[data-a]"); if (!r) return;
-    const f = CUR.files.find(x => x.path === r.dataset.a); if (!f) return;
-    if (f.kind === "text" && f.editable) return ideOpen(f.path, "apk");
-    if (f.kind === "image" && f.editable) { closePanel(); return openImageEditor(f.path); }
-    try { const info = await api(`/api/projects/${CUR.id}/file?path=${enc(f.path)}`); toast(info.reason || "Este archivo no se puede editar.", "warn"); }
-    catch (x) { toast(x.message, "err"); }
-  };
-}
-
-/* ---------- Editor de imágenes e iconos ---------- */
-const loadImg = url => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error("No se pudo cargar la imagen.")); i.src = url; });
-const rawPath = (p, v) => `/api/projects/${enc(CUR.id)}/raw?path=${enc(p)}&version=${v}&t=${Date.now()}`;
-const loadRaw = (p, v) => authBlobUrl(rawPath(p, v)).then(loadImg);
-const MIME = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp" };
-
-function renderImage(src, W, H, fit, e, quality) {
-  const c = document.createElement("canvas"); c.width = W; c.height = H;
-  const g = c.getContext("2d");
-  if (e === "jpg" || e === "jpeg") { g.fillStyle = "#fff"; g.fillRect(0, 0, W, H); }
-  const sw = src.naturalWidth, sh = src.naturalHeight;
-  if (fit === "stretch") g.drawImage(src, 0, 0, W, H);
-  else {
-    const k = fit === "cover" ? Math.max(W / sw, H / sh) : Math.min(W / sw, H / sh);
-    g.drawImage(src, (W - sw * k) / 2, (H - sh * k) / 2, sw * k, sh * k);
-  }
-  return new Promise(res => c.toBlob(b => res({ blob: b, canvas: c }), MIME[e], quality));
-}
-async function uploadImage(path, blob) {
-  const fd = new FormData(); fd.append("file", blob, "img");
-  return api(`/api/projects/${CUR.id}/replace?path=${enc(path)}`, { method: "POST", body: fd });
-}
-
-async function openImageEditor(path) {
-  const e = extOf(path), iconPath = CUR.p.info.iconPath || "", ib = iconPath ? baseName(iconPath) : "";
-  const family = ib ? CUR.files.filter(f => f.kind === "image" && f.editable && f.path.startsWith("res/") && baseName(f.path) === ib) : [];
-  const isIcon = family.some(f => f.path === path);
-  const modified = () => !!CUR.files.find(f => f.path === path)?.modified;
-
-  const ov = overlay(`<div class="ovbar"><b class="ttl" id="ttl"></b><button class="btn sm" id="bClose">✕</button></div>
-   <div class="ovbody scroll"><div class="card"><div class="kv"><div>Formato</div><div>${esc(e.toUpperCase())}</div><div>Dimensiones originales</div><div id="dim">…</div><div>Ruta</div><div class="perm" id="pth"></div></div>
-   ${isIcon ? `<div class="note" style="margin-top:12px">Este recurso es parte del icono de la app (${family.length} densidades).${iconPath.endsWith(".xml") ? " La app usa un icono adaptativo (XML): Android moderno puede mostrar ese en vez de estos PNG; cambiarlo del todo requiere Apktool (pestaña Propiedades)." : ""}</div>` : ""}</div>
-   <div class="card"><div class="row" style="align-items:flex-start">
-     <div><div class="perm">Original</div><img class="pv" id="io" alt=""></div>
-     <div id="curBox" hidden><div class="perm">Actual (guardada)</div><img class="pv" id="ic" alt=""></div>
-     <div id="newBox" hidden><div class="perm">Nueva (vista previa)</div><div id="cvBox"></div><div class="perm" id="newInfo"></div></div></div></div>
-   <div class="card">
-     ${e === "gif" ? '<div class="note">Los GIF no se pueden convertir en el navegador. Para reemplazarlo, usa otro GIF mediante la API.</div>' : `
-     <button class="btn primary" id="pick">Elegir imagen del teléfono</button><input type="file" id="file" accept="image/*" hidden>
-     <div style="margin-top:14px"><label class="perm">Ajuste al tamaño original</label>
-       <select id="fit"><option value="contain">Mantener proporciones (sin recortar)</option><option value="cover">Rellenar recortando</option><option value="stretch">Estirar (deforma)</option></select></div>
-     ${e === "png" ? "" : '<div style="margin-top:14px"><label class="perm">Calidad: <span id="qv">90</span>%</label><input type="range" id="ql" min="40" max="100" value="90" style="width:100%"></div>'}
-     ${family.length > 1 && isIcon ? `<label style="display:flex;gap:10px;align-items:center;margin-top:14px;min-height:44px"><input type="checkbox" id="all" checked style="width:22px;height:22px"> Aplicar a todas las densidades del icono (${family.length} archivos)</label>` : ""}
-     <div class="row" style="margin-top:14px"><button class="btn primary" id="apply" disabled>Aplicar cambio</button></div>`}
-     <div class="row" style="margin-top:10px"><button class="btn danger" id="restore">Restaurar original</button></div>
-     <div class="perm" id="msg" style="margin-top:10px"></div></div></div>`);
-  const q = s => ov.querySelector(s);
-  q("#ttl").textContent = path; q("#pth").textContent = path;
-  q("#bClose").onclick = () => ov.close();
-
-  let W = 0, H = 0, src = null, last = null;
-  loadRaw(path, "original").then(im => { W = im.naturalWidth; H = im.naturalHeight; q("#dim").textContent = W + " × " + H + " px"; q("#io").src = im.src; })
-    .catch(x => toast(x.message, "err"));
-  const showCurrent = () => { const on = modified(); q("#curBox").hidden = !on; if (on) authBlobUrl(rawPath(path, "current")).then(u => { q("#ic").src = u; }).catch(() => {}); };
-  showCurrent();
-
-  if (e !== "gif") {
-    const quality = () => (q("#ql") ? Number(q("#ql").value) / 100 : undefined);
-    const preview = async () => {
-      if (!src || !W) return;
-      const r = await renderImage(src, W, H, q("#fit").value, e, quality());
-      if (!r.blob) { q("#msg").textContent = "Tu navegador no puede generar " + e.toUpperCase() + "."; last = null; q("#apply").disabled = true; return; }
-      last = r; q("#cvBox").replaceChildren(r.canvas); r.canvas.className = "pv";
-      q("#newBox").hidden = false;
-      const big = r.blob.size > 5 * 1048576;
-      q("#newInfo").textContent = `${W} × ${H} px · ${e.toUpperCase()} · ${fmt(r.blob.size)}${big ? " — supera 5 MB, baja la calidad" : ""}`;
-      q("#apply").disabled = big;
-    };
-    q("#pick").onclick = () => q("#file").click();
-    q("#file").onchange = async ev => {
-      const f = ev.target.files[0]; if (!f) return;
-      try { src = await loadImg(URL.createObjectURL(f)); await preview(); } catch (x) { toast("No se pudo leer esa imagen.", "err"); }
-    };
-    q("#fit").onchange = preview;
-    if (q("#ql")) q("#ql").oninput = () => { q("#qv").textContent = q("#ql").value; preview(); };
-    q("#apply").onclick = async () => {
-      if (!last || !src) return;
-      q("#apply").disabled = true;
-      const targets = (q("#all") && q("#all").checked) ? family.map(f => f.path) : [path];
-      try {
-        for (let i = 0; i < targets.length; i++) {
-          q("#msg").textContent = `Aplicando ${i + 1}/${targets.length}…`;
-          let blob = last.blob;
-          if (targets[i] !== path) {
-            const o = await loadRaw(targets[i], "original");
-            const r = await renderImage(src, o.naturalWidth, o.naturalHeight, q("#fit").value, extOf(targets[i]), quality());
-            if (!r.blob) throw new Error("No se pudo generar " + targets[i]);
-            blob = r.blob;
-          }
-          await uploadImage(targets[i], blob);
-        }
-        toast(targets.length > 1 ? targets.length + " archivos reemplazados" : "Imagen reemplazada");
-        q("#msg").textContent = "Listo.";
-        await reloadFiles(); drawProject(); showCurrent();
-      } catch (x) { toast(x.message, "err"); q("#msg").textContent = x.message; }
-      q("#apply").disabled = false;
-    };
-  }
-  q("#restore").onclick = async () => {
-    const targets = (q("#all") && q("#all").checked ? family : CUR.files.filter(f => f.path === path)).filter(f => f.modified).map(f => f.path);
-    if (!targets.length) return toast("No hay cambios guardados que restaurar.", "warn");
-    if (!confirm("¿Restaurar " + targets.length + " archivo(s) al original?")) return;
-    try {
-      for (const t of targets) await api(`/api/projects/${CUR.id}/changes?path=${enc(t)}`, { method: "DELETE" });
-      toast("Restaurado"); await reloadFiles(); drawProject(); showCurrent();
-    } catch (x) { toast(x.message, "err"); }
-  };
-}
-
-async function runDiag() {
-  const out = [], add = (s, t, d = "", fix = "") => out.push({ s, t, d, fix });
-  const base = apiBase();
-  const ls = (() => { try { localStorage.setItem("_t", "1"); localStorage.removeItem("_t"); return true; } catch { return false; } })();
-  const miss = [!window.FormData && "FormData", !window.XMLHttpRequest && "XHR", !ls && "almacenamiento"].filter(Boolean);
-  miss.length ? add("bad", "Navegador", "Faltan: " + miss.join(", "), "Usa Chrome actualizado y no el modo privado.") : add("ok", "Navegador", "Funciones necesarias disponibles");
-  add("ok", "Esta página", location.origin);
-  const staticHost = /vercel\.app|netlify\.app|github\.io|pages\.dev/.test(location.host);
-  if (!base) staticHost ? add("bad", "URL del backend", "No configurada, y esta web es estática (no tiene backend).", "Ve a Configuración y pega la URL pública de tu backend (https://...).") : add("warn", "URL del backend", "Vacía: se usa el mismo servidor que esta página.");
-  else if (!/^https?:\/\//.test(base)) add("bad", "URL del backend", base, "Debe empezar por http:// o https://.");
-  else if (location.protocol === "https:" && base.startsWith("http://")) add("bad", "HTTPS", "La web es HTTPS y el backend es HTTP: el navegador lo bloquea.", "Usa un backend con https://.");
-  else add("ok", "URL del backend", base);
-  let h = null;
-  try {
-    const r = await fetch(base + "/health"), ct = r.headers.get("content-type") || "";
-    if (!r.ok) add("bad", "Conexión /health", "HTTP " + r.status + (r.status === 404 ? " (esa dirección no tiene /health)" : ""), base ? "Verifica que sea la URL del backend y que esté desplegado." : "Configura la URL del backend en Configuración.");
-    else if (!ct.includes("json")) add("bad", "Conexión /health", "Respondió una página web, no la API.", "Esa URL es una web. Usa la del backend.");
-    else { h = await r.json(); add("ok", "Conexión con el servidor", "Responde correctamente"); }
-  } catch (e) {
-    let cors = false;
-    if (base) { try { await fetch(base + "/health", { mode: "no-cors" }); cors = true; } catch {} }
-    cors ? add("bad", "CORS", "El servidor responde pero bloquea a esta web.", "En el backend define CORS_ORIGIN=" + location.origin + " y reinícialo.")
-         : add("bad", "Conexión con el servidor", "No responde (" + e.message + ")", "Abre la URL del backend + /health en otra pestaña. Si es plan gratis y estaba dormido, espera ~1 minuto.");
-  }
-  if (h) {
-    h.db ? add("ok", "Base de datos", "Conectada") : add("bad", "Base de datos", "No responde (" + (h.dbError || "sin detalle") + ")", "Revisa DATABASE_URL en el backend.");
-    h.aapt ? add("ok", "aapt (lectura de APK)", h.aaptVersion || "instalado") : add("bad", "aapt", "No encontrado en el servidor", "Instala el paquete aapt o ajusta AAPT_BIN.");
-    h.storage ? add("ok", "Almacenamiento", "Escribible") : add("bad", "Almacenamiento", "No se puede escribir en STORAGE_DIR", "Monta un disco/volumen persistente y revisa STORAGE_DIR.");
-    h.build ? add("ok", "Reconstrucción y firma", "zip, zipalign, apksigner y clave de firma listos")
-            : add("bad", "Reconstrucción y firma", "Falta: " + ((h.missing || []).join(", ") || "configuración"), "Define KEYSTORE_PASSWORD (8+ caracteres) en Render y despliega con el Dockerfile nuevo.");
-    h.googleLogin ? add("ok", "Inicio de sesión con Google", "Configurado en el servidor (FIREBASE_PROJECT_ID)")
-                  : add("bad", "Inicio de sesión con Google", "Falta FIREBASE_PROJECT_ID en el servidor.", "En Render → Environment agrega FIREBASE_PROJECT_ID=kendy-mods.");
-    if (h.backup) {
-      !h.backup.enabled ? add("warn", "Respaldo en Cloudinary", "Desactivado: sin él, el disco gratuito borra tus archivos al reiniciar.", "En Render agrega CLOUDINARY_CLOUD_NAME + CLOUDINARY_UPLOAD_PRESET (o API key y secret) y BACKUP_KEY (16+ caracteres).")
-      : h.backup.lastError ? add("bad", "Respaldo en Cloudinary", "Último error: " + h.backup.lastError, "Revisa las credenciales de Cloudinary.")
-      : add("ok", "Respaldo en Cloudinary", "Activo (cifrado)" + (h.backup.signed ? "" : ", sin firma: no se borran copias viejas") + ". Pendientes: " + h.backup.pending);
+    if (b.dataset.act === 'copy') return copy(k);
+    if (b.dataset.act === 'revoke') {
+      await update(ref(db, 'keys/' + k), { revoked: !v.revoked });
+      toast(v.revoked ? 'Key reactivada' : 'Key revocada');
     }
-    h.jadx ? add("ok", "JADX (ver código como Java)", "Disponible")
-           : add("warn", "JADX (ver código como Java)", "No está instalado en el servidor.", "Despliega con el Dockerfile nuevo.");
-    h.apktool ? add("ok", "Apktool (propiedades y XML)", "apktool y aapt2 disponibles")
-              : add("warn", "Apktool (propiedades y XML)", "Falta: " + ((h.apktoolMissing || []).join(", ") || "configuración"), "Despliega con el Dockerfile nuevo. Sin esto no funciona la pestaña Propiedades.");
-    add("ok", "Límite de subida", (h.maxMb || "?") + " MB");
-    try {
-      const r = await fetch(base + "/api/projects", { headers: getToken() ? { Authorization: "Bearer " + getToken() } : {} });
-      r.ok ? add("ok", "API de proyectos", "HTTP 200")
-        : r.status === 401 ? add("warn", "API de proyectos", "Responde, pero hace falta iniciar sesión.", "Entra con tu cuenta (menú → Iniciar sesión).")
-        : add("bad", "API de proyectos", "HTTP " + r.status, "Mira los logs del backend.");
-    }
-    catch (e) { add("bad", "API de proyectos", e.message); }
-  }
-  return out;
-}
-
-function viewDiag() {
-  view.innerHTML = `<h1>Diagnóstico</h1><p class="sub">Revisa cada parte, dice qué falla y cómo arreglarlo.</p>
-  <div class="card"><div class="row"><button class="btn primary" id="run">Ejecutar diagnóstico</button><button class="btn" id="copy">Copiar informe</button></div><div id="res" style="margin-top:14px"></div></div>
-  <div class="card"><h2>Registro de errores de esta web</h2><div id="log"></div><button class="btn danger" id="clr" style="margin-top:10px">Borrar registro</button></div>`;
-  let last = [];
-  const icon = { ok: "✔", bad: "✖", warn: "⚠" };
-  const drawLog = () => { $("#log").innerHTML = errLog.length ? errLog.slice().reverse().map(e =>
-    `<div class="chk bad"><b>${esc(e.src)}</b> · ${esc(e.msg)}<small>${esc(e.t)} ${esc(e.detail)}</small></div>`).join("") : "Sin errores registrados."; };
-  const run = async () => {
-    $("#res").textContent = "Comprobando…"; last = await runDiag();
-    $("#res").innerHTML = last.map(c => `<div class="chk ${c.s}"><b>${icon[c.s]} ${esc(c.t)}</b><small>${esc(c.d)}</small>${c.fix ? `<div class="fix">→ ${esc(c.fix)}</div>` : ""}</div>`).join("");
-    const bad = last.filter(c => c.s === "bad").length; if (bad) logErr("diagnóstico", bad + " problema(s) detectado(s)"); drawLog();
-  };
-  $("#run").onclick = run;
-  $("#clr").onclick = () => { errLog = []; localStorage.removeItem(LOG_KEY); drawLog(); };
-  $("#copy").onclick = async () => {
-    const txt = ["KENDY diagnóstico " + new Date().toISOString(), "Página: " + location.href, "Backend: " + (apiBase() || "(vacío)"), "Navegador: " + navigator.userAgent, "",
-      ...last.map(c => `[${c.s.toUpperCase()}] ${c.t}: ${c.d} ${c.fix ? "-> " + c.fix : ""}`), "", "Errores:",
-      ...errLog.map(e => `${e.t} [${e.src}] ${e.msg} ${e.detail}`)].join("\n");
-    try { await navigator.clipboard.writeText(txt); toast("Informe copiado"); } catch { toast("No se pudo copiar", "err"); }
-  };
-  drawLog(); run();
-}
-
-async function viewAdmin() {
-  view.innerHTML = '<h1>Administración</h1><p class="sub">Cuentas de este servidor. Eliminar una cuenta borra también sus proyectos y archivos.</p><div id="ulist">Cargando…</div>';
-  let rows;
-  try { rows = await api("/api/admin/users"); }
-  catch (e) { $("#ulist").innerHTML = `<div class="card" style="color:var(--err)">${esc(e.message)}</div>`; return; }
-  const me = localStorage.getItem("kendy_user");
-  $("#ulist").innerHTML = rows.map(u => `<div class="card"><b style="word-break:break-all">${esc(u.email)}</b> <span class="tag">${esc(u.role)}</span>
-    <div class="perm">${u.projects} proyecto(s) · ${fmt(u.storage)} · alta ${esc(fmtDate(u.created_at))}</div>
-    ${u.email === me ? '<div class="perm" style="margin-top:8px">Esta es tu cuenta.</div>'
-      : `<div class="row" style="margin-top:10px"><button class="btn sm" data-role="${esc(u.id)}" data-to="${u.role === "admin" ? "user" : "admin"}">${u.role === "admin" ? "Quitar admin" : "Hacer admin"}</button><button class="btn sm danger" data-deluser="${esc(u.id)}" data-email="${esc(u.email)}">Eliminar cuenta</button></div>`}</div>`).join("");
-  $("#ulist").onclick = async ev => {
-    const t = ev.target.closest("button"); if (!t) return;
-    const d = t.dataset;
-    try {
-      if (d.role) { await api(`/api/admin/users/${d.role}`, { method: "PATCH", headers: jsonHdr, body: JSON.stringify({ role: d.to }) }); toast("Rol actualizado"); viewAdmin(); }
-      else if (d.deluser) {
-        if (!confirm(`¿Eliminar la cuenta ${d.email}? Se borrarán sus proyectos y archivos. No se puede deshacer.`)) return;
-        await api(`/api/admin/users/${d.deluser}`, { method: "DELETE" }); toast("Cuenta eliminada"); viewAdmin();
+    if (b.dataset.act === 'free') {
+      if (await confirmBox('¿Liberar el teléfono de esta key? La próxima persona que la use quedará enlazada.')) {
+        await remove(ref(db, `keys/${k}/device`));
+        toast('Teléfono liberado');
       }
-    } catch (e) { toast(e.message, "err"); }
-  };
-}
-
-function viewSettings() {
-  view.innerHTML = `<h1>Configuración</h1><p class="sub">Si el backend está en otro dominio, indica su URL (debe permitir CORS). Déjalo vacío si esta página la sirve el propio backend.</p>
-  <div class="card"><label for="api">URL del servidor</label><input type="text" id="api" placeholder="https://api.tudominio.com" value="${esc(apiBase()).replace("—", "")}">
-  <div class="row" style="margin-top:12px"><button class="btn primary" id="save">Guardar</button></div></div>`;
-  $("#save").onclick = () => { const v = $("#api").value.trim();
-    if (v && !/^https?:\/\//.test(v)) return toast("La URL debe empezar por http:// o https://", "err");
-    localStorage.setItem("kendy_api", v); toast("Guardado"); };
-}
-
-/* ---------- Router ---------- */
-const side = $("#side");
-function openMenu() { side.classList.add("open"); document.body.classList.add("menu"); }
-function closeMenu() { side.classList.remove("open"); document.body.classList.remove("menu"); }
-
-function route() {
-  stopPoll();
-  const [, r, arg] = (location.hash || "#/home").split("/");
-  renderWho();
-  if (!getToken() && !["login", "settings", "diag"].includes(r)) { location.hash = "#/login"; return; }
-  closeMenu();
-  $("#view").scrollTop = 0;
-  view.classList.remove("ide-mode");
-  const key = r === "s" ? "s:" + arg : r === "project" ? "projects" : r;
-  document.querySelectorAll(".nav[data-r]").forEach(a => a.classList.toggle("active", a.dataset.r === key));
-  if (r === "s") return viewSection(arg);
-  ({ home: viewHome, import: viewImport, projects: viewProjects, settings: viewSettings, diag: viewDiag, login: viewLogin, admin: viewAdmin }[r]
-    || (r === "project" ? () => viewProject(arg) : viewHome))();
-}
-$("#burger").onclick = () => (side.classList.contains("open") ? closeMenu() : openMenu());
-$("#closeSide").onclick = closeMenu;
-$("#backdrop").onclick = closeMenu;
-addEventListener("keydown", e => { if (e.key === "Escape") closeMenu(); });
-addEventListener("hashchange", route); route();
+    }
+    if (b.dataset.act === 'del') {
+      if (await confirmBox('¿Eliminar esta key para siempre?')) {
+        await remove(ref(db, 'keys/' + k));
+        toast('Key eliminada');
+      }
+    }
+  } catch (err) {
+    toast('Error: ' + (err.code || err.message), true);
+  }
+};
 </script>
 </body>
 </html>
